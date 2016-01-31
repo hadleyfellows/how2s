@@ -1,0 +1,956 @@
+
+Android
+
+
+HISTORY
+
+	- Term Android - is used to refer to the operaing system.
+	- operating system - based on Linux
+	- has an application framework
+	- based on a Linux Kernel
+
+	- released 2008 Version 1.0
+	- released 2009 Version 1.1
+
+	( I believe we are talking about the Android SDK )	
+	( Or the android operating system my bad )	
+		- web browser
+		- camera support
+		- search
+		- maps
+		- services
+		- sync
+		- instant messanger
+		- media player
+		- showing / hiding dial pad
+		- saving attachments
+
+	- released 2009 we have...
+
+		Cupcake Version 1.5
+	 
+			- Video support
+			- home screen
+			- widgets
+			- copy / paste in web browser
+			- pictures in contacts
+			- animated screen transitions
+			- auto-rotation
+
+		Donut Version 1.6
+
+			- expands gestures
+			- integrates camera / gallery
+
+		Eclair Version 2.0
+
+			- multiple accounts
+			- bluetooth 2.1
+			- microsoft exchange
+			- searching sms / mms
+			- more screen sizes ?
+
+		Froyo Version 2.2
+
+			- speed enhancement
+			- memory enhancement
+			- JS V8 engine in Chrome
+			- USB tethering
+			- wifi hotspot
+
+		Gingerbread	Version 2.3
+
+			- garbage collector
+			- video audio improvements
+			- NFC ( near field communication )
+			- clipboard enhancements
+
+		--------- TABLETS STARTING COMING AROUND ------------
+
+		Honeycomb 2011 Version 3.0
+
+			- predominately for tablets
+			- fragments API
+			- action bar
+
+		*********	Gingerbread for phones and honeycomb for tablets	************
+
+		Ice Cream Sandwich Version 4.0
+
+			- unified tablets and smartphones SDKs
+			- video and audio improvements
+			- customizable launcher
+
+
+		Jelly Bean Version 4.1
+
+			- performance improvements
+
+		Jelly Bean Version 4.2
+
+			- better camera
+			- multi user support for tablets
+			- unified layout engine
+
+		Jelly Bean Version 4.3 2013
+
+			- bluetooth low energy
+			- improved gaming graphics
+
+		KitKat Version 4.4
+
+			- memory and power management
+			- NFC
+			- printing
+			- storage
+			- sms
+			- rich media
+			- accessibility
+
+BUILD
+
+	BASE -> TOP LEVEL
+
+		1. Linux Kernal
+			
+			A. WiFi Driver
+			B. Power managment
+			C. Keypad driver
+			D. Flash Memory
+			E. Display Driver
+			F. Camera driver
+			G. Binder IPC driver
+			H. Audio Driver
+
+		2. Android Runtime and Libraries
+			
+			A. Android Runtime
+				
+				1. Core Libraries
+				2. JVM ( Dalvik virtual machine )
+					a. reads different bitecode for small devices than other java apps
+					b. need this this compiler to run on small devices
+
+			B. Libraries
+
+				1. FreeType
+				2. libc
+				3. LibWebCore
+				4. Media framework
+				5. OpenGL
+				6. SGL
+				7. SQLite
+				8. SSL
+
+		3. Application Framework
+
+			A. Activity Manager
+			B. Content providers
+			C. Location manager
+			D. Notification manager
+			E. Package manager
+			F. Telephony manager
+			G. Resource manager
+			H. Window manager
+
+		4. Applications
+
+			A. Home
+			B. Browser
+			C. Contacts
+			D. Phone
+			E. Productivity suite
+			F .....
+
+APP ARCHITECTURE
+
+	App Components:
+
+		Activities - represents user interface screens
+			- activities use layouts
+			- resepesents a part of the screen
+			- an instance of a class
+				ex. android.app.Activity
+
+		Widgets - manage display and user interactivity
+			- layouts use widgets
+		Services - perform background jobs
+			 
+
+	App Java version:
+
+		uses Java 5 APIs and a bit of Java 6
+
+ECLIPSE STUFF
+
+	setup the window layout 
+		- window/open perspective/ options
+	add remove views
+		- window/show view/ options
+	save perspective
+		- window / save perspective
+
+
+	ADD ANDROID PACKAGES
+		- window/ android sdk manager /
+			this shows you all the tools
+
+
+DEVELOPMENT 1 2 3
+
+	INSTALL ON ECLIPSE 
+
+		PRE REQ
+
+			Eclipse installation must meet these requirements:
+
+			Eclipse 3.7.2 (Indigo) or greater
+			Note: Eclipse 3.6 (Helios) is no longer supported with the latest version of ADT.
+			Eclipse JDT plugin (included in most Eclipse IDE packages)
+			JDK 6 (JRE alone is not sufficient)
+				download the jdk plugin from oracle assholes
+
+			Not compatible with GNU Compiler for Java (gcj)
+
+		ADT INSTALL
+
+			Start Eclipse, then select Help > Install New Software.
+			Click Add, in the top-right corner.
+			In the Add Repository dialog:
+				Name: "ADT Plugin"
+				Location: https://dl-ssl.google.com/android/eclipse/
+
+					Note: The Android Developer Tools update site requires a secure connection. Make sure the update site URL you enter starts with HTTPS.
+			Click OK.
+			Select the checkbox next to Developer Tools and click Next.
+					In the next window, you'll see a list of the tools to be downloaded. Click Next.
+					Read and accept the license agreements, then click Finish.
+					If you get a security warning saying that the authenticity or validity of the software can't be established, click OK.
+			When the installation completes, restart Eclipse.
+
+
+			CONFIGURE
+
+				Once Eclipse restarts, you must specify the location of your Android SDK directory:
+
+				In the "Welcome to Android Development" window that appears, select Use existing SDKs.
+				Browse and select the location of the Android SDK directory you recently downloaded and unpacked.
+				Click Next.
+				Your Eclipse IDE is now set up to develop Android apps, but you need to add the latest SDK platform tools and an Android platform to your environment. To get these packages for your SDK, continue to Adding Platforms and Packages.
+
+
+		INSTALL SDK PACKAGES
+
+			open window -> Android SDK Manager 
+
+				ADD TOOLS
+
+					Android SDK Tools
+					Android SDK Platform-tools
+					Android SDK Build-tools
+
+				ADD 5.0.1 (API 21) -- OR CURRENT API
+
+					SDK Platform
+					SDK ARM system image
+
+					AND EVERYTHING ELSE
+
+				ADD OLDER VERSIONS OR API SDKs
+
+				EXTRAS
+
+					Android Support library
+					Google USB Driver
+					Intel x86
+
+				ACCEPT INSTALL PERMISSIONS
+				RESTART ECLIPSE AND BUILD PUNK
+
+
+
+	VIRTUAL DEVICES
+
+		1. window > android virtual device manager
+		2. click on device definitions
+		3. select a device
+			A. name it whatever (no psaces) and select device def.
+			B. Target : version operating system you want your device to use
+			C. CPU/ABI : ARM
+			D. Skin with hardware buttons
+			E. Memory Options: RAM 768 mb or LESSS!!!!!
+
+		DEVICE IS CREATED
+
+		4. back on the Android Virtual Device
+			A. Select device and click start
+			B. Scale device? hell no
+			C. wipe out user data? start from scratch
+			D. Launch
+
+		THIS IS HELLA SLOW
+		
+		DEVICE IS LAUNCHED ?
+
+
+
+	SETUP EMULATOR ( see it on a emulated phone )
+
+		2 METHODS ( the emulator on windows OR intel x86 )
+
+			USE INTEL x86
+				1. in the sdk manager make sure you have the extra download: intelx86 something
+
+				2. next go to:
+					C:\wamp\www\JAVA\androidSDK\extras\intel\Hardware_Accelerated_Execution_Manager
+				3. run intelhaxm-android.exe
+				4. it may already be installed
+				5. now open eclipse and create a new avd
+					a. window > device manager
+					b. run through steps earlier for settign up emulator
+					c. change CPU/ABI to Intel Atom x86
+					d. emulation options: use Host GPU
+				6. start or launch virtual device
+
+	DEVELOP ON AN ACTUAL PHONE
+
+		1. make sure you have a usb driver
+			google usb driver
+			location from downloading it from the sdk manager:
+				C:\wamp\www\JAVA\androidSDK\extras\google\usb_driver
+			check to see if the driver is installed
+				I think this is done if you can access your files
+		2. Go into your device
+			a. go to phone settings
+			b. click more 
+			c. if developer options is not there:
+					b. go to about this phone
+					c. scroll to build number
+					d. tap 7 times 
+			d. go to developer options
+				1. usb debugging
+				2. stay awake
+			e. notifications should say:
+				1. mode of connection
+				2. USB debugging connected
+			f. make sure your usb connection is as:
+				A CAMERA!!!!
+
+		3. eclipse go to window show view
+			0. other...
+			a. android > click devices
+			b. back to phone you should see a allow computer
+			c. now in the devices tab you should see your android device
+
+
+	APP APP APP APP
+		
+		DEVELOP APP
+	
+	APP APP APP APP
+
+	SETUP
+		1. File > New Android Application >
+			a. Application Name:
+			b. Project Name:
+			c. Package Name: source code reverse order
+				ex. com.hadleyfellows.androidapp
+				this is where your compiled packeage is stored
+			d. min SDk : icecreamSandwich?
+			e. target SDK: most recent
+			f. compile with: most recent
+			g. theme: holo light with dark action bar
+			h. next
+		2. leave defaults... next
+		3. change icon to what you want girl... next
+		4. Activity...
+			a. this is the screen?
+			b. I think this is a template
+			c. blank activity
+		4. app.java name is MainActivity..
+			a. stay with defaults and click next
+		5. finish
+	RUN
+		from MainActivity.java
+			1. click run as > run config....
+			2. android application > new_configuration 
+				a. android tab:
+					select your app
+				b. target tab:
+					select virtual device or
+					select always prompt to pick device tab:
+						then you can select which device you want
+	FILE STRUCTURE	
+		Android Project
+			"src" 
+				- contains all java code
+				- contains packages
+				"com.example.fortune"
+					- contains the app classes
+					"MainActivity.java"
+			"gen" 
+				- classes that are generated automatically
+				- BuildConfig.java
+				- R.java (which uses the res classes)
+			"Android 4.4"
+				- contains android.jar file
+					- part of the sdk installation
+					- change it by going project properties and select different android sdk
+					- project clean
+					- refresh and see new jar location
+			"Android Private Libraries"
+				- support library that emulates modern features on older android systems
+			"Assets"
+				- contains files for your project
+					ex. images, or some stuff
+			"bin"
+				- contains compiled code
+			"libs"
+				- add java libraries
+			"res"
+				- contains files that define appearance and behaviors
+				- layout
+				- menu
+				- values
+			"AndroidManifest.xml"
+				- I think this is like app.js
+				- apps id and capabilities
+				important:
+				- package name does not change when you change it in the eclipse gui
+				- versionCode need to increment by 1
+				- version Name can increment by .01 or .1
+				uses-sdk : whole numbers
+					- minsdk 
+					- targetsdk
+					- maxsdk
+				application
+					- has cool stuff from res folder
+
+each screen is an activity
+
+
+
+	ANDROID SDK API
+
+		On the line
+			developer.android.com/guide/components/index.html
+			http://developer.android.com/reference/packages.html
+
+
+		Eclipse
+			select something and click help > dynamic help > and rigt coulumn opens up
+
+
+
+	ACTIVITY MAIN . XML 	( LAYOUT )
+
+		what?  in xml defines the layout o your app
+		where? app > res > layout > activity_main.xml
+
+		This is like the index of your layout
+
+			1. @strings - res > values > strings.xml
+			2. @dimens  - res > values > dimens.xml
+			3. @styles  - res > values > styles
+
+
+	APP BUILD 
+		Code that loads layout at run time
+
+		1. ANDROID MANIFEST .xml calls
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN" />	
+				<category android:name="android.intent.category.LAUNCHER" />
+			</intent-filter>
+
+		2. android.intent.action.MAIN calls
+			MainActivity.java
+
+				onCreate method is like the java main method.
+			
+				protected void onCreate(Bundle savedInstanceState) {
+						super.onCreate(savedInstanceState);
+						setContentView(R.layout.activity_main);
+				}
+		3. setContentView(R.layout.activity_main);
+			and you know that loads:
+				res > layout > activity_main.xml
+
+			ADD LAYOUT 
+				1. go to res > layout (right click)
+				2. new android xml file
+				3. name it! (underscores and lowercase)
+				4. choose a layout
+
+	WIDGETS ARE JAVA VIEWS
+
+		Instances of classes
+		ex. 1
+			android.view.View (View)
+				android.widget.TextView ( subclass TextView )
+					android.widget.Button ( subclass Button )
+						android.widget.CompoundButton ( subclass CompoundButton )
+		ex. 2
+			android.view.View (View)
+				android.widget.ViewGroup
+					android.widget.LinearLayout
+					android.widget.AbsoluteLayout
+					android.widget.RelativeLayout
+
+	DIMENSIONS
+
+		UNITS
+			( these units scale?! )
+			DP ( device indepenedent pixels ) dpi!!!!
+			DP is 160 dpi
+			As screen resolutions increase so does the dp-to-pixel ratio
+
+			SP ( scale independent pixels )
+				used for fonts
+
+			Fixed units
+				( note fixed pixels dont scale )
+				px, pt, mm(milimeters), in(inches)
+
+		USAGE
+
+			@dimen/name_of_dimension
+
+			in res > values > dimens.xml
+				add dimen value
+
+			Values folders are like Media queries
+				values folder is the default
+				values-w820dp is for 820 dimensions
+
+			ex. in code
+
+				float pixels = TypedValue.appplyDimension(
+					TypedValue.COMPLEX_UNIT_DIP, 100, getResources().getDisplayMetrics()
+				);
+				myButton.getLayoutParams().height = (int) pixels;
+	LAYOUT
+
+		WHERE
+
+			MainActivity > onCreate > setContentView(R.layout.new_layout);
+
+			res > layout > new_layout 
+
+			ex.
+				"@+id/button1" is like "#id" in css
+				you can define these in values > strings
+
+		NESTED LAYOUTS
+
+			EX. 
+				<?xml version="1.0" encoding="utf-8"?>
+				<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+				    android:layout_width="match_parent"
+				    android:layout_height="match_parent"
+				    android:orientation="vertical" >
+
+
+				    <LinearLayout
+				        android:layout_width="match_parent"
+				        android:layout_height="wrap_content" >
+					        
+					        
+					    <TextView
+					        android:id="@+id/textView1"
+					        android:layout_width="50dp"
+					        android:layout_height="wrap_content"
+					        android:text="@string/name" />
+					
+					    <EditText
+					        android:id="@+id/editText1"
+					        android:layout_width="wrap_content"
+					        android:layout_height="wrap_content"
+					        android:ems="10" >
+					
+					        <requestFocus />
+					    </EditText>
+				    </LinearLayout>
+					
+					    <Button
+					        android:id="@+id/button1"
+					        android:layout_width="wrap_content"
+					        android:layout_height="wrap_content"
+					        android:text="@string/add_user" />
+
+				</LinearLayout>
+
+
+		MARGIN	
+			ex. 1
+			android:layout_margin="30dp"
+			ex. 2
+			android:gravity="center_horizontal"
+
+
+		RELATIVE LAYOUT CONTAINER
+
+			res > values > dimens.xml
+				has values
+			res > layout > relative_layout.xml
+
+				android:layout_alignParentRight="true"
+				android:layout_alignParentLeft="true"
+				android:layout_alignParentTop="true"
+				android:layout_alignParentBottom="true"
+				android:layout_below="@+id/textView1"
+				android:layout_marginRight="24dp"
+				android:layout_marginTop="51dp"
+        		android:layout_alignBaseline=""
+
+
+        		android:layout_width="match_parent"
+        		android:layout_height="match_parent"
+
+		        android:layout_width="wrap_content"
+		        android:layout_width="fill_parent"
+				
+		ADD OBJECTS DYNAMICALLY
+
+			1. make sure layout has an id:
+				<RelativeLayout
+					...
+					...
+					android:id="@+id/view_name" >
+
+			2. in the onCreate(){
+				LinearLayout layout = findViewById(R.id.view_name);
+
+			}
+
+			3. now click "command + 1" and
+				add caste on findViewById()
+
+			4. add dynamic content
+				onCreate(){
+					LinearLayout layout = findViewById(R.id.view_name);
+
+					Button button = new Button(this);
+					button.setText(R.string.click_me); 
+					layout.addView(button);
+
+				}
+
+			5. cool.
+	FONTS
+	
+		<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		    xmlns:tools="http://schemas.android.com/tools"
+		    android:layout_width="match_parent"
+		    android:layout_height="match_parent"
+		    android:paddingBottom="@dimen/activity_vertical_margin"
+		    android:paddingLeft="@dimen/activity_horizontal_margin"
+		    android:paddingRight="@dimen/activity_horizontal_margin"
+		    android:paddingTop="@dimen/activity_vertical_margin"
+		    tools:context="com.example.fortune.MainActivity" >
+		    <CheckBox
+		        android:id="@+id/checkBox3"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+				android:layout_alignParentLeft="true"
+		        android:layout_below="@+id/checkBox2"
+		        android:text="CheckBox" />
+
+		    <ImageView
+		        android:id="@+id/imageView1"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_below="@+id/checkBox3"
+				android:layout_centerHorizontal="true"
+		        android:src="@drawable/fortune_cookie" />
+		    
+		    <TextView
+		        android:id="@+id/textView2"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_alignParentLeft="true"
+		        android:layout_below="@+id/imageView1"
+		        android:text="@string/fortune_decription"
+		        android:textAppearance="?android:attr/textAppearanceLarge"
+		        android:textSize="14sp" />
+
+		</RelativeLayout>
+
+	IMAGES
+
+		<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		    xmlns:tools="http://schemas.android.com/tools"
+		    android:layout_width="match_parent"
+		    android:layout_height="match_parent"
+		    android:paddingBottom="@dimen/activity_vertical_margin"
+		    android:paddingLeft="@dimen/activity_horizontal_margin"
+		    android:paddingRight="@dimen/activity_horizontal_margin"
+		    android:paddingTop="@dimen/activity_vertical_margin"
+		    tools:context="com.example.fortune.MainActivity" >
+
+		    <CheckBox
+		        android:id="@+id/checkBox1"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_alignParentLeft="true"
+		        android:layout_below="@+id/textView1"
+		        android:text="CheckBox" />
+
+
+		    <ImageView
+		        android:id="@+id/imageView1"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_below="@+id/checkBox3"
+				android:layout_centerHorizontal="true"
+		        android:src="@drawable/fortune_cookie" />
+		    
+		    <TextView
+		        android:id="@+id/textView2"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_alignParentLeft="true"
+		        android:layout_below="@+id/imageView1"
+		        android:text="@string/fortune_decription"
+		        android:textAppearance="?android:attr/textAppearanceLarge"
+		        android:textSize="14sp" />
+
+		</RelativeLayout>
+
+
+
+	DEBUGGING
+
+		LogCat.zip
+			Log class
+				- Log.d(tag,msg);
+				- Log.d("current class","your message");
+		Toast messages
+			- like js alert on the screen
+				Toast msg = Toast.makeText(context,text,duration);
+				Toast msg = Toast.makeText(this,"activity created",Toast.LENGTH_LONG);
+				msg.show();
+
+				Toast.makeText(this,"you selected"+item,Toast.LENGTH_LONG).show();
+
+		Breakpoints.zip
+
+			- you can double click line number to add a breakpoint
+			- now you need to run in debug mode
+				run > debug
+				or 
+				F11
+			- watch view
+				selct variable name
+				right click and select watch
+
+			- remove breakpoints
+				breakpoint view or double click
+
+			- variables view 
+				shows variable values at breakpoint. 
+
+		DDMS
+			( Dalvik Debug Monitor Server )
+			window > ddms
+			or
+			command line
+
+			heap view - shows device usage
+			application tracker
+			network statistics
+			file explorer
+			emulator control
+
+		
+	NAVIGATION ( Activity )
+
+		Create a new class off of MainActivity
+
+			src > package with MainActivity in it > right click > new > class
+
+			set name to end with "Activity"
+				ex. DetailActivity
+
+			superclass : 
+				browse and select
+				"Activity - android.app"
+
+			click ok and finish
+
+		Now Register the Activity to manifest
+
+			Activity AndroidManifest.xml
+
+				add activity:
+					if activity is in main package:
+						<activity
+						    android:name=".MainActivity"
+						    android:label="@string/app_name" >
+						</activity>
+					else give full qualified name:
+						<activity
+						    android:name="com.example.fortune.MainActivity"
+						    android:label="@string/app_name" >
+						</activity>
+
+		Create a layout for activity
+
+			layout > right click > new android xml file
+				pick a layout
+				and name lower case with underscores
+
+
+		Bind Layout to Activity
+
+			in NameActivity.java add:
+				protected void onCreate(Bundle savedInstanceState) {
+					super.onCreate(savedInstanceState);
+					setContentView(R.layout.relative_layout);
+				}
+
+		CONNECT ACTIVITY TO ACTIVITY
+
+			INTENT
+
+				EXPLICIT INTENT
+					MainActivity
+					DetailActivity
+				IMPLICIT
+
+EVENT HANLDER
+
+	From MAIN:
+
+		Button CLick
+
+
+			<Button
+			    android:id="@+id/button1"
+			    android:layout_width="wrap_content"
+			    android:layout_height="wrap_content"
+			    android:layout_below="@+id/textView2"
+			    android:layout_marginTop="61dp"
+			    android:layout_toRightOf="@+id/checkBox3"
+			    android:text="Go to Activity"
+			    android:background="#666666"
+	----->		android:onClick="gotoActivity" />
+
+
+	ctrl + "space" = list options
+
+			add this method to activity with button
+				public void gotoActivity(View v){
+					Intent intent = new Intent(this,DetailActivity.class);
+					startActivity(intent);
+				}
+
+	FROM DETAILS
+
+
+		import android.app.Activity;
+		import android.os.Bundle;
+		import android.view.MenuItem;
+
+		public class DetailActivity extends Activity {
+
+			@Override
+			protected void onCreate(Bundle savedInstanceState) {
+				super.onCreate(savedInstanceState);
+				setContentView(R.layout.new_layout);
+				getActionBar().setDisplayHomeAsUpEnabled(true);
+			}
+			@Override
+			public boolean onOptionsItemSelected(MenuItem item) {
+				if(item.getItemId() == android.R.id.home){
+					finish();
+				}
+				return super.onOptionsItemSelected(item);
+			}
+		}
+
+ACTIVITIES 
+
+	TASKS AND BACK STACKS
+
+		APP ( TASK )
+			ACTIVITY ( launch, login, order, pimp )
+			STACKS
+				- layers of activities
+					ex. launch activity > login activity
+					2 stack (launch on bottom)
+
+	CONVENTIONS
+
+		- on a single device only one activity is active at a time
+		- an activity can be the last activity like when you press back
+		- back stack are previous activities
+
+	Activity States
+		resumed - top of stack visible and interactive
+		paused - visible but without focus
+		stopped - not visible
+		inactive - completely removed from stack
+
+	Activity Lifecycle
+
+		1. onCreate() Created
+		2. onStart()  Started
+		3. onResume() Resumed
+		4. onPaused() Paused
+		5. onStop()   Stopped
+		5. onDestroy()   Destroyed
+
+		FROM STOPPED TO RESUME
+
+		1. onRestart() Restart
+		2. onStart() Start
+		3. onResume() Resume
+
+		FROM PAUSED TO RESUME
+
+		1. onResume() Resume
+
+
+
+		EACH ACTIVITY HAS THESE ACTION AS ABOVE
+
+			@Override
+			protected void onCreate(Bundle savedInstanceState) {
+				super.onCreate(savedInstanceState);
+				Log.d(LOGTAG, "onCreate");
+			}
+			@Override
+			protected void onResume() {
+				super.onResume();
+				Log.d(LOGTAG, "onResume");
+			};
+			@Override
+			protected void onStart() {
+				super.onStart();
+				Log.d(LOGTAG, "onStart");
+			};
+			@Override
+			protected void onPause() {
+				super.onPause();
+				Log.d(LOGTAG, "onPause");
+			};
+			@Override
+			protected void onStop() {
+				super.onStop();
+				Log.d(LOGTAG, "onStop");
+			};
+			@Override
+			protected void onDestroy() {
+				super.onDestroy();
+				Log.d(LOGTAG, "onDestroy");
+			};
+			@Override
+			protected void onRestart() {
+				super.onRestart();
+				Log.d(LOGTAG, "onRestart");
+			};
+
+
+LYNDA 7. supporting multiple devices
+
