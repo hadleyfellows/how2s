@@ -26,3 +26,19 @@ git bisect
 git cherry pick
 git hooks
 git subdamin
+
+
+
+Instant remote git repository using ssh
+These instructions assume that you can do an automatic login from a local to a remote machine using ssh keys for user $username.
+Remote
+
+cd folder/to/become/repository.git
+git init --bare
+Local
+
+cd folder/to/become/local/repository
+git init
+git remote add remote_name ssh://$username@remote.hostname/path/to/repository.git
+git pull remote_name master
+...and you're done, you've just gotta love git!
