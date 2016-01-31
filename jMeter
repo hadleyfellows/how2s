@@ -1,0 +1,70 @@
+
+
+JMeter interface and Vocab
+
+	Test Plan ( JMeter script )
+	Thread Group ( thread == user )
+	Samplers ( makes a request )
+	Config Elements
+	Timer ( add a delay )
+	Listener ( reporting, logging and debugging )
+	Assertions ( error checking )
+	Pre processors ( modify the request )
+	Post processors ( parse the response )
+	Logic Controller
+	WorkBench ( temp working space )
+
+how to install
+
+Simple static script
+	
+	1. test plan > right click > add > threads > thread groups (group of users)
+		number of users : 10 ( number of users )
+		ramp up period : 60 ( period it happens )
+	2. threads > right click > add > sampler > http request
+		server name : ip
+		path : /
+	3. threads > right click > add > listener > view results in table
+		select and on header click play
+HTTP Cache Manager
+	TestPlan > right click > add > Config Element > HTTP Cache Manager
+Cookie Manager
+	TestPlan > right click > add > Config Element > Cookie Manager
+Request Defaults Manager
+	TestPlan > right click > add > Config Element > Request Defaults Manager
+Constance timer - adds delay
+
+*** make sure to clear cache between each iteration ***
+
+
+Recording User Script With A Browser
+	JMETER HTTP RECORDING FEATURE
+
+		1. file > templates > recording > create
+		2. added WorkBench
+			- recording controller
+			- http test script recorder
+			- htttp proxy and add them as requests in your project
+		3. Configure by going to  browser's configuration 
+			firefox
+				network settings > use proxy settings > localhost : 8888
+			chrome 
+				settings > network / proxy settings > lan settings > use proxy settings > localhost : 8888
+		4. Back on HTTPS Test Script Rcorder
+			at the bottom click start
+		5. In the browser navigate somewhere do an activity
+		6. Go back to JMETER and click stop
+		7. All recorded stuff is in the thread group
+		8. now you can play it back
+			** but you will see errors
+		9. dynamic authentication security causes errors 
+			check this out...
+
+			when you play the recorded traffic you are issued session keys or tokens
+			what we need to do is grab the issued session token when it is issued and add it to proceeding requests
+			we use a post processor for this
+
+		10. Regular expression extractor
+			we will use this  grabbing the session token and passing it to following requests
+			Test Plan > right click > add > Post Processors > Regular Expression ExTeConfig Element
+
