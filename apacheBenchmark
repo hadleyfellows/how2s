@@ -1,0 +1,156 @@
+Apache Benchmarl
+
+/c/wamp/bin/apache/apachex.x.x/bin/ab.exe
+
+alias ab='/c/wamp/bin/apache/apachex.x.x/bin/ab.exe'
+
+target='http://vector.com/some/route'
+
+target_cookie='SESSweud0924ufjt47f6thd4j8r6y89try'
+
+ab -c1 -n 50 -C $target_cookie $target
+
+"-c1" concurrent connections = 1
+"-n 50" number of connections = 50
+"-C $target_cookie $target" = using a a cookie
+
+
+EXAMPLE 
+			bousqueg@SUNMR840GX70288 ~/dev/Vector/Vector1.1-rc1/performance_testing (test/pe
+			rformance_testing)
+			$ ./performance_testing.sh
+			This is ApacheBench, Version 2.3 <$Revision: 1554214 $>
+			Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+			Licensed to The Apache Software Foundation, http://www.apache.org/
+
+			Benchmarking vector_rc1_performance_testing (be patient).....done
+
+
+			Server Software:        Apache/2.4.9
+			Server Hostname:        vector_rc1_performance_testing
+			Server Port:            82
+
+			Document Path:          /
+			Document Length:        32092 bytes
+
+			Concurrency Level:      1
+			Time taken for tests:   14.563 seconds
+			Complete requests:      5
+			Failed requests:        0
+			Total transferred:      162570 bytes
+			HTML transferred:       160460 bytes
+			Requests per second:    0.34 [#/sec] (mean)
+			Time per request:       2912.509 [ms] (mean)
+			Time per request:       2912.509 [ms] (mean, across all concurrent requests)
+			Transfer rate:          10.90 [Kbytes/sec] received
+
+			Connection Times (ms)
+			              min  mean[+/-sd] median   max
+			Connect:        0    1   0.5      1       1
+			Processing:  2784 2912 102.8   2938    3053
+			Waiting:     2738 2865 103.1   2892    3007
+			Total:       2785 2913 102.3   2939    3053
+
+			Percentage of the requests served within a certain time (ms)
+			  50%   2926
+			  66%   2952
+			  75%   2952
+			  80%   3053
+			  90%   3053
+			  95%   3053
+			  98%   3053
+			  99%   3053
+			 100%   3053 (longest request)
+
+
+GOLDEN
+
+	$ ab -c1 -n50 -C 'SESSdd56de4137951d9c92681b03416ec15f' 'http://golden/cases'
+	This is ApacheBench, Version 2.3 <$Revision: 1554214 $>
+	Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+	Licensed to The Apache Software Foundation, http://www.apache.org/
+
+	Benchmarking golden (be patient).....done
+
+
+	Server Software:        Apache/2.4.9
+	Server Hostname:        golden
+	Server Port:            80
+
+	Document Path:          /cases
+	Document Length:        8459 bytes
+
+	Concurrency Level:      1
+	Time taken for tests:   16.430 seconds
+	Complete requests:      50
+	Failed requests:        0
+	Total transferred:      444050 bytes
+	HTML transferred:       422950 bytes
+	Requests per second:    3.04 [#/sec] (mean)
+	Time per request:       328.596 [ms] (mean)
+	Time per request:       328.596 [ms] (mean, across all concurrent requests)
+	Transfer rate:          26.39 [Kbytes/sec] received
+
+	Connection Times (ms)
+	              min  mean[+/-sd] median   max
+	Connect:        0    0   0.0      0       0
+	Processing:   312  329   8.0    328     359
+	Waiting:      296  313   7.7    312     343
+	Total:        312  329   8.0    328     359
+
+	Percentage of the requests served within a certain time (ms)
+	  50%    328
+	  66%    328
+	  75%    328
+	  80%    328
+	  90%    343
+	  95%    343
+	  98%    359
+	  99%    359
+	 100%    359 (longest request)
+
+VECTOR
+	
+	$ ab -c1 -n50 -C 'SESSdd56de4137951d9c92681b03416ec15f' 'http://vector/cases'
+	This is ApacheBench, Version 2.3 <$Revision: 1554214 $>
+	Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+	Licensed to The Apache Software Foundation, http://www.apache.org/
+
+	Benchmarking vector (be patient).....done
+
+
+	Server Software:        Apache/2.4.9
+	Server Hostname:        vector
+	Server Port:            80
+
+	Document Path:          /cases
+	Document Length:        8459 bytes
+
+	Concurrency Level:      1
+	Time taken for tests:   16.387 seconds
+	Complete requests:      50
+	Failed requests:        0
+	Total transferred:      444050 bytes
+	HTML transferred:       422950 bytes
+	Requests per second:    3.05 [#/sec] (mean)
+	Time per request:       327.740 [ms] (mean)
+	Time per request:       327.740 [ms] (mean, across all concurrent requests)
+	Transfer rate:          26.46 [Kbytes/sec] received
+
+	Connection Times (ms)
+	              min  mean[+/-sd] median   max
+	Connect:        0    0   0.0      0       0
+	Processing:   312  328   6.4    328     343
+	Waiting:      281  312   7.8    312     328
+	Total:        312  328   6.4    328     343
+
+	Percentage of the requests served within a certain time (ms)
+	  50%    328
+	  66%    328
+	  75%    328
+	  80%    328
+	  90%    335
+	  95%    343
+	  98%    343
+	  99%    343
+	 100%    343 (longest request)
