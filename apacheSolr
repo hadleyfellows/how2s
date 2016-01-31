@@ -1,0 +1,276 @@
+
+Apache Solr
+
+OVERVIEW
+
+Apache Solr is a powerful search server, which supports REST like API. Solr is powered by Lucene which enables powerful matching capabilities like phrases, wildcards, joins, grouping and many more across various data types. It is highly optimized for high traffic using Apache Zookeeper. Apache Solr comes with a wide set of features and we have listed a subset of  high impact features.
+	Advanced Full-Text search capabilities.
+	Standards based on Open Interfaces – XML, JSON and Http.
+	Highly scalable and fault tolerant.
+	Supports both Schema and Schemaless configuration.
+	Faceted Search and Filtering.
+	Support major languages like English, German, Chinese, Japanese, French and many more
+	Rich Document Parsing.
+
+WHY APACHE SOLR
+	
+	SQL was not designed for searching. It was built as a large filing cabinet.
+	Apache Solr provides a remedy to RDBMS (Relational Database Management Systems).
+	Addidtional features include autocomplete, spelling suggestions, and content recs.
+
+
+
+INSTALL AND SETUP
+
+	download apache solr 5.3
+		http://lucene.apache.org/solr/downloads.html
+	download log4j 1.2.17
+	add this path to environmental variables
+		C:\wamp\www\apachesolr\apache-log4j-1.2.17\log4j-1.2.17.jar
+
+NAVIGATION
+
+	/bin - start and stop the server
+	/example - few Solr examples
+	/server - contains the logs
+	/solr - contains different collections or core
+
+
+START SERVER
+	CMD.exe
+	/bin/solr start
+	http://localhost:8983/solr/
+
+		start params
+			-f   			Start Solr in foreground; default starts Solr in the background
+			                and sends stdout / stderr to solr-PORT-console.log
+			-c or -cloud  	Start Solr in SolrCloud mode; if -z not supplied, an embedded ZooKeeper
+			                instance is started on Solr port+1000, such as 9983 if Solr is bound to 8983
+			-h host       	Specify the hostname for this Solr instance
+			-p port       	Specify the port to start the Solr HTTP listener on; default is 8983
+			-d dir        	Specify the Solr server directory; defaults to example
+			-z zkHost     	ZooKeeper connection string; only used when running in SolrCloud mode using -c
+			                To launch an embedded ZooKeeper instance, don't pass this parameter.
+			-m memory     	Sets the min (-Xms) and max (-Xmx) heap size for the JVM, such as: -m 4g
+			                results in: -Xms4g -Xmx4g; by default, this script sets the heap size to 512m
+			-s dir        	Sets the solr.solr.home system property; Solr will create core directories under
+			                this directory. This allows you to run multiple Solr instances on the same host while reusing the same server directory set using the -d parameter. If set, the specified directory should contain a solr.xml file, unless solr.xml exists in ZooKeeper. This parameter is ignored when running examples (-e), as the solr.solr.home depends on which example is run. The default value is server/solr.
+			-e example    	Name of the example to run; available examples:
+							    cloud:          SolrCloud example
+							    techproducts:   Comprehensive example illustrating many of Solr's core capabilities
+							    dih:            Data Import Handler
+							    schemaless:     Schema-less example
+			-a opts       	Additional parameters to pass to the JVM when starting Solr, such as to setup
+			              	Java debug options. For example, to enable a Java debugger to attach to the Solr JVM you could pass: -a "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=18983"
+			              	In most cases, you should wrap the additional parameters in double quotes.
+			-noprompt     	Don't prompt for input; accept all defaults when running examples that accept user input
+			-V            	Verbose messages from this script
+
+
+STOP SERVER
+	CMD.exe
+	/bin/solr stop
+		bin\solr stop -p 8983
+		bin\solr stop -all
+	http://localhost:8983/solr/
+
+CONFIGURATION
+
+	Solr is running in standalone (core) 
+	SolrCloud mode (collection)
+
+	CREATE A CORE OR COLLECTION
+		bin\solr create_core <name>
+		bin\solr create_collection <name>
+			OPTIONS
+				-c - name of core to create
+				-d - config directory
+				-p - port to create new core
+				-s – Number of shards to split a collection into, default is 1.
+				-rf – Number of copies of each document in the collection. The default is 1.
+
+		SCHEMA.XML (fit for quering your data)
+			location : core_folder/conf/schema.xml
+			ie 
+				<uniqueKey>id</uniqueKey> - The column to be unique. In Drupal nid.
+			ie
+				<field name="name" type="text_general" indexed="true" stored="true"/>
+					indexed="true" - the record can be retrieved using the index
+					stored="true" -  the record can be returned in the output
+
+		INDEXING DATA
+			OPTION 1
+				*** Standalone Java program called the SimplePostTool. *** 
+					location : example\exampledocs\ post.jar
+				Steps to index data to core / collection
+					1. add to schema as above
+					2. post data to core collection
+						command :  
+							java 
+								-Dtype=<data type> 
+								-Durl=http://localhost:8983/solr/<core/collection name>/update 
+								-jar post.jar  <data file>
+							ie :
+							java 
+								-Dtype=text/csv 
+								-Durl=http://localhost:8983/solr/core_demo/update 
+								-jar post.jar  books.csv
+
+					MORE EXAMPLES
+
+						java -jar post.jar *.xml
+						java -Ddata=args  -jar post.jar '<delete><id>42</id></delete>'
+						java -Ddata=stdin -jar post.jar < hd.xml
+						java -Ddata=web -jar post.jar http://example.com/
+						java -Dtype=text/csv -jar post.jar *.csv
+						java -Dtype=application/json -jar post.jar *.json
+						java -Durl=http://localhost:8983/solr/update/extract -Dparams=literal.id=a -Dtype=application/pdf -jar post.jar a.pdf
+						java -Dauto -jar post.jar *
+						java -Dauto -Drecursive -jar post.jar afolder
+
+			OPTION 2
+				Using curl command and Solr REST api
+					ADD INDEX :
+						curl http://localhost:8983/solr/demo/update -d '
+						[
+						 {"id" : "book1",
+						  "title_t" : "The Way of Kings",
+						  "author_s" : "Brandon Sanderson"
+						 }
+						]'
+					RETRIEVE DATA :
+						$ curl http://localhost:8983/solr/demo/get?id=book1
+						{
+						  "doc": {
+						    "id" : "book1",
+						    "author_s": "Brandon Sanderson",
+						    "title_t" : "The Way of Kings",
+						    "_version_": 1410390803582287872
+						  }
+						}
+					UPDATING DATA :
+						$ curl http://localhost:8983/solr/demo/update -d '
+						[
+						 {"id"         : "book1",
+						  "cat_s"      : { "add" : "fantasy" },
+						  "pubyear_i"  : { "add" : 2010 },
+						  "ISBN_s"     : { "add" : "978-0-7653-2635-5" }
+						 }
+						]'
+
+		DYNAMIC FIELDS
+			My understanding is that if the field ends with "_i" or other characters Solr will dynamically determine the field type, index it, and store it.
+				ie :
+				<dynamicField name="*_i"  type="int"    indexed="true"  stored="true"/>
+				<dynamicField name="*_is" type="int"    indexed="true"  stored="true"  multiValued="true"/>
+				<dynamicField name="*_s"  type="string"  indexed="true"  stored="true" />
+
+		QUERING DATA
+			http://localhost:8983/solr/<core/collection name>/select?q=<field>:"<value>"
+			ie :
+				basic:
+					http://localhost:8983/solr/jcg/select?q=name:"A Clash of Kings"\
+				contains:
+					http://localhost:8983/solr/jcg/select?q=name:"A"
+				wildcard:
+					http://localhost:8983/solr/jcg/select?q=name:"*of"
+				conditional:
+					http://localhost:8983/solr/jcg/select?q=*&fq=price:[0 TO 6]
+						fq - filter queries (the fields range 0-6)
+				sort:
+					sort=pubyear_i desc
+				limit:
+					rows=3
+			
+			This REST API returns XML of the records in response
+				ie. 
+					<response>
+						<lst name="responseHeader">
+							<int name="status">0</int>
+							<int name="QTime">31</int>
+							<lst name="params">
+								<str name="q">name:"A Clash of Kings"</str>
+							</lst>
+						</lst>
+						<result name="response" numFound="1" start="0">
+						<doc>
+							<str name="id">0553579908</str>
+							<str name="cat">book</str>
+							<str name="name">A Clash of Kings</str>
+							<double name="price">7.99</double>
+							<bool name="inStock">true</bool>
+							<str name="author">George R.R. Martin</str>
+							<str name="series_t">A Song of Ice and Fire</str>
+							<int name="sequence_i">2</int>
+							<str name="genre_s">fantasy</str>
+							<long name="_version_">1512495079923646464</long>
+						</doc>
+						</result>
+					</response>
+
+
+DRUPAL
+	1. In solr create a core named drupal
+	2. replace conf files from the module conf to the solr core drupal conf
+	3. drush en apachesolr apachesolr_search search
+			admin/config/search/apachesolr/settings
+	4. Solr server URL: http://localhost:8983/solr/drupal
+	5. test connection, make sur eyou run bin\solr start
+	6. Disable default search
+		a. disable default search by http://iris/admin/config/search/settings
+			set ApacheSolr search as the default search module
+
+		default search tables: search_dataset, search_index ...
+
+	7. DRUSH COMMANDS
+		All commands in apachesolr: (apachesolr)
+		 solr-delete-index     Deletes the content from the index. Can take content types as parameters.
+		 solr-get-env-id       Get the default Apache Solr environment ID, or all IDs and names
+		 solr-get-env-name     Get the Apache Solr environment name.
+		 solr-get-env-url      Get the Apache Solr environment url.
+		 solr-get-last-indexe  Get the ID of the last document indexed.
+		 d
+		 solr-get-next-indexe  Get the ID of the next document to be indexed.
+		 d
+		 solr-index            Reindexes content marked for (re)indexing. You must supply the -l (--uri) parameter if $base_url is not set in settings.php.
+		 solr-mark-all         Marks content for reindexing. Can take content types as parameters.
+		 solr-search           Search the site for keywords using Apache Solr
+		 solr-set-env-url      Set the url for an Apache Solr environment.
+		 solr-variable-delete  Delete an Apache Solr environment variable.
+		 (solr-vdel)
+		 solr-variable-get     Get a list of Apache Solr environment variable names and values.
+		 (solr-vget)
+		 solr-variable-set     Set an Apache Solr environment variable.
+		 (solr-vset)
+
+
+Further information :
+	Solr Examples
+	Indexing Documents
+	File inclusion
+	Instructions for building Apache Solr
+	Export control
+
+Vocab :
+	Faceted search - adding classification to information. When we index columns in a database it is like adding a facet?
+	Nodes - nodes in Solr or any search server refers to the number of threads used to search information. More specifically one node may search users, while other nodes may search a particular content's attribute.
+
+
+TO DO:
+Cron Module
+	Elysia Cron http://drupal.org/project/elysia_cron
+		allows user to set up crons at different times and at different frequencies
+
+Alternatively, you can launch Solr in "cloud" mode,
+which allows you to scale out using sharding and replication. To launch Solr
+in cloud mode, do:
+
+  bin/solr start -cloud
+
+REFERENCE GUIDE
+	https://cwiki.apache.org/confluence/display/solr/Schema+API
+
+GOOD
+http://examples.javacodegeeks.com/enterprise-java/apache-solr/apache-solr-tutorial-beginners/
+OK
+http://yonik.com/solr-tutorial/
