@@ -1,0 +1,1349 @@
+DRUSH COMMANDS
+
+drush updatedb
+drush --debug pm-updatestatus
+
+drush cc theme-registry
+
+core-status status
+site-install, si
+pm-download, dl
+pm-enable, en
+clear-cache, cc
+watchdog-show, ws
+self-update
+epdatedb
+core-rsync, rsync
+sql-sync
+
+pm-update, up <module name>
+
+drush st database
+drush sql-connect
+drush -y up <module name>
+
+INSTALL DRUSH TO COMMAND LINE
+
+	http://drupalistasgroup.com/installing-drush-7-windows-xampp
+	There is also a module at drupal.org/project/drush
+
+drush make (creates a drupal project rather than downloading and loading modules manually)
+	
+	we need a make file though
+	and connect to the database
+
+
+************************************
+************************************
+PATCHES
+************************************
+************************************
+	
+	https://www.drupal.org/patch/apply
+
+	1. download and install cygwin ( manually add patch packages. click skip and checkbox for the 2 options instead of n/a)
+	2. now right click the patch and save link as... to the module folder. (usually the main module not the sub module.)
+	3. open up cygwin terminal and cd to module.
+	4. run :
+			patch -p1 < <patchname>.patch (This should do the trick)
+			patch -p1 --dry-run < <patchname>.patch ( this is a test of the patch)
+
+
+	
+
+drush up ( lists all available updates )
+
+DRUSH ALIASES
+
+cd to site directory
+and run drush commands
+
+
+
+CHMOD
+
+chmod 0444 ( read only )
+
+
+***********************************
+***********************************
+***********************************
+***********************************
+
+MODULE DEVELOPMENT
+
+
+***********************************
+***********************************
+***********************************
+***********************************
+
+
+			If you’re interested in seeing the function that drives the hook mechanism, see the
+			module_invoke_all() function in includes/module.inc.
+
+	*************************
+	*************************
+		DRUPAL'S HOOKS
+	*************************
+	*************************
+
+			Drupal’s hooks allow modification of almost any aspect of the software. A complete list of supported
+			hooks and their uses can be found at the Drupal API documentation site (http://api.drupal.org).
+
+			http://api.drupal.org/api/function/hook_menu/7
+
+
+			process:
+				
+			1	url -> index.php -> index.php?q=node/32 -> node/32
+
+			2	looks for:
+
+					function hook_menu() {
+
+					$items['node/32'] = array(
+						
+						'title' => 'Annotation settings',
+						'description' => 'Change how annotations behave.',
+						'page callback' => 'drupal_get_form',
+						'page arguments' => array('annotate_admin_settings'),
+						'access arguments' => array('administer site configuration'),
+						'type' => MENU_NORMAL_ITEM,
+						'file' => 'annotate.admin.inc',
+					);
+
+					return $items;
+
+			3	hook_init();
+
+
+
+
+		HOOKS
+
+			hook_menu()
+
+
+				function user_warn_menu(){
+					$items = array();
+
+					$items['admin/config/people/user_warn'] = array(
+						'title' => 'User Warn',
+						'description' => 'Configuration for the User Warn module.',
+						'page callback' => 'drupal_get_form',
+						'page arguments' => array('user_warn_form'),
+						'access arguments' => array('administer users'),
+						'type' => MENU_NORMAL_ITEM,
+					);
+
+					// the percent sign in our url is a wildcard for the user id
+					$items['user/%/warn'] = array(
+
+						// used wherever in your site
+						'title' => 'Warn',
+						'description' => 'Send e-mail to a user about improper site behavior.',
+						
+						// everything here is sent to forms api
+							// page arguments consist of the form id 
+							// and the number is the parameter in the url
+						'page callback' => 'drupal_get_form',
+						'page arguments' => array('user_warn_confirm_form', 1),
+						'acces arguments' => array('administer users'),
+
+						// https://api.drupal.org/api/drupal/includes!menu.inc/group/menu_item_types/7
+						'type' => MENU_LOCAL_TASK,
+					);
+
+					// returned is an array of page locations.
+					return $items;
+				}
+
+
+			hook_help()
+
+				function hook_help($path, $arg) {
+
+					switch ($path) {
+				    // Main module help for the block module
+				    case 'admin/help#First':
+				      return '<p>' . t('First Help Text') . '</p>';
+
+				    }
+
+				}
+
+			FORMS HOOKS
+
+				hook_form()
+				hook_form_submit
+				hook_confirm_form_submit()
+				hook_confirm_submit()
+
+			MAIL HOOKS
+
+				drupal_mail() ( when ran it looks for a hook_mail() to send the mail && and this is stored in your hook_form_submit() )
+				hook_mail() ( where we actually send the mail)
+
+
+			hook_block()
+
+				
+				hook_block_info(): This is used to tell Drupal about the new block or blocks that we will declare
+				
+				hook_block_view(): This tells Drupal what to do when a block is requested for viewing
+
+
+			theme_hooks
+
+				are crazy
+
+				http://drupal.org/theme-guide
+
+					Theme functions and template files
+					Preprocess and process functions
+					Default theme implementations and theme overrides
+					drupal_render(), render elements and their properties
+					hook_element_info()
+					hook_page_alter()
+					theme(), theme hooks and theme hook suggestions
+					Theme registry, hook_theme(), and hook_theme_registry_alter()
+
+				You can browse all of Drupal core's default theme implementations at:
+					
+					http://api.drupal.org/api/group/themeable/7
+
+
+
+
+	*************************
+	*************************
+		DRUPAL'S Theme Registry
+	*************************
+	*************************
+
+			1.	global $theme;
+				// $registry = _theme_load_registry($theme);
+				// dsm($registry);
+
+			2. 
+				
+				/**
+				 * Implements hook_theme_registry_alter
+				 */
+				function vector_quiz_image_theme_registry_alter(&$theme_registry) {
+				  $theme_registry['question_selection_table']['theme path'] = drupal_get_path('module', 'vector_quiz_image');
+				  $theme_registry['question_selection_table']['function'] = 'vector_question_selection_table';
+				}
+
+	*************************
+	*************************
+		DRUPAL'S FORM API
+	*************************
+	*************************
+
+			Form API Quickstart guide:
+				
+				http://api.drupal.org/api/drupal/developer--topics--forms_api.html/7
+
+			Form API Full Reference:
+				
+				http://api.drupal.org/api/drupal/developer--topics--forms_api_reference.html/7
+
+			
+
+	**************************
+	**************************
+		VARIABLES
+	**************************
+	**************************
+
+			Variables are semi perminant variables
+				(Can be a php object, string, assoc array, ...)
+
+			1. variable_set()
+
+			2. variable_get()
+
+				variable_get('user_warn_e-mail_subject', 'Administrative Warning'),
+
+					where 'user_warn_e-mail...' = the variable name
+					and "administrative warning" = the value
+
+			3. define('USER_WARN_MAIL_TEXT',
+				'Hello,
+				We have been notified that you have posted comments on our site that are in violation of our terms of service. If this behavior continues your account will be suspended.
+				Sincerely,
+				The administrative staff');
+
+					where 'USER_WARN_MAIL_TEXT' =  the variable name
+					and 'hello..... ' = value of the variable
+
+
+	***********************
+	***********************
+		TOKENS
+	***********************
+	***********************
+
+			1. Tokens are like session data that are not killed when a session is killed.
+			2. Tokens are used site wide
+			3. If you replace a toke it replaces it everywhere.
+
+				token_replace( $body, array('user' => $account) );
+
+			ex. [node:author:e-amil]
+
+			Info on exposing tokens in your module to site-wide
+
+				http://api.drupal.org/api/function/hook_token_info/7
+				http://api.drupal.org/api/function/hook_tokens/7
+
+			Tokens module SHows you available tokens
+			OR
+			token_info()
+
+			EXAMPLE *************
+				$available_tokens = 'Available variables are: ';
+				$tokens = token_info();
+				foreach ($tokens['tokens']['site'] as $key => $value) {
+				  $site_tokens[] = '[site:' . $key .']';
+				}
+
+				foreach ($tokens['tokens']['user'] as $key => $value) {
+				  $site_tokens[] = '[user:' . $key .']';
+				}
+				$available_tokens .= implode(', ', $site_tokens);
+			EXAMPLE *************
+
+
+
+	*************************
+	*************************
+		SCHEMA
+	*************************
+	*************************
+
+			See http://drupal.org/node/146843 for more information on the Schema API.
+
+			example: artwork.install
+
+				function artwork_schema(){
+					
+					// table to be created
+					$schema['artwork'] = array(
+
+						//fields to be created
+						'description' => 'The base table for artworks.',
+						'fields' => array(
+
+							'aid' => array(
+								'description' => 'The primary identifier for an artwork.',
+								'type' => 'serial',
+								'unsigned' => TRUE,
+								'not null' => TRUE,
+							),
+							'vid' => array(
+								'description' => 'The current {artwork_revision} .vid version identifier.',
+								'type' => 'int',
+								'unsigned' => TRUE,
+								'not null' => TRUE,
+								'default' => 0,
+							),
+			//close example
+
+			The schema hook adds and removes the data tables upon enabling and unenabling the module.
+
+
+	*****************
+	*****************
+		ENTITY
+	*****************
+	*****************
+
+		1. hook_entity_info() ( tells drupal about this data structure )
+
+				function artwork_entity_info(){
+					
+					$return['artwork'] = array(
+						'label' => t('Artwork'),
+						'controller class' => 'ArtworkController',
+						'base table' => 'artwork',
+						'revision table' => 'artwork_revision',
+						'uri callback' => 'artwork_uri',
+						'fieldable' => TRUE,
+						'entity keys' => array(
+							'id' => 'aid',
+							'revision' => 'vid',
+							'bundle' => 'type',
+							'label' => 'title', 
+						),
+						'bundle keys' => array(
+							'bundle'=> 'type',
+						),
+						'static cache' => TRUE,
+						'bundles' => array(),
+						'views modes' => array(
+							'full' => array(
+								'label'=> t('Full content'),
+								'custom settings' => FALSE,
+
+							),
+							'teaser' => array(
+								'label'=> t('Teaser'),
+								'custom settings' => FALSE,
+							),
+						),
+					);
+
+					foreach (artwork_types() as $type => $info){
+						$return['artwork']['bundles'][$type] = array(
+							'label' => $info->name,
+							'admin' => array(
+								'path' => 'admin/structure/artworks/manage/%artwork_type',
+								'real path' => 'admin/structure/artworks/manage/'. str_replace('_', '-', $type),
+								'bundle argument' => 4,
+								'access arguments' => array('administer artworks'),
+							),
+						);
+					}
+					
+					return $return;
+
+				}
+
+				
+				function artwork_uri($artwork) {
+
+					return array(
+						'path' => 'artwork/' . $artwork->aid,
+					);
+
+				}
+
+				When creating a link to an entity, always use entity_uri($type, $entity) to generate the parameters to pass to either the url() or l() functions.
+
+
+		2. a controller loader class ( DrupalDefaultEntityController ) ( loading and, in our case, creating, saving, and deleting our data )
+
+		3. Later we have hook_entity_info_alter()
+
+
+
+
+
+		************** 
+		************** 
+		  ACCESS
+		************** 
+		**************
+
+				Node Access
+
+				-Drupal system for controlling the access to nodes -
+				( View, Edit, Delete, and CREATE nodes)
+
+				***********************************************
+
+				Drupal is a “deny-based” access control system.
+
+
+				node_acces only relates to "node/" operations CRUD
+
+
+
+
+					Database
+
+						These node Locks are stored in the node_access database table, which means they are cached.
+
+						This table is only rebuilt when you run the Rebuild Permissions in the Status Report area of your Drupal admin.
+
+
+						Simply add a “tag” to the query called “node_access”. For example:
+
+						PHP
+
+						$query = db_select('node', 'n');
+						  ->fields('n', array('nid', 'title'))
+						  ****************************************
+						  ->addTag('node_access');
+						  ****************************************
+						$result = $query->execute();
+						
+						
+
+						node access table
+
+							nid, gid, realm, grant_view, grant_update, grant_delete
+
+
+
+					hooks()
+
+						hook_node_access_records($node)
+							hook_node_access($node)  ---- lock, realm
+							hook_node_access_records($node)  ---- lock, realm
+							(remember that Realm is usually your module name)
+
+							*** LOCKS ***
+							(data creation?)
+
+							1. data entry
+							2. node_save()
+							3. node_access_acquire_grants()
+							4. node_access
+
+
+							function example_node_access_records($node){
+								$grants[] = array(
+									'realm' => 'example_author',
+									'gid' => $node->uid,
+									'grant_view' => 1,
+									'grant_update' => 1,
+									'grant_delete' => 1,
+									'priority' => 0,
+								);
+
+								return $grants;
+							}
+
+					
+
+						hook_node_grants($account, $op) ---- keys, grants
+
+								*** KEYS ***
+
+								1. inbound request
+								2. $user
+								3. node_access_grants()
+								4. Page / Request Render
+
+								ex. 
+									function example_node_grants($account, $op){
+										if(user_access('access private content', $account)){
+											$grants['example'] = array(1);
+										}
+										$grants['example_owner'] = array($account->uid);
+										return $grants;
+									}
+
+						
+						hook_node_access($node, $op, $account);
+
+									NODE_ACCESS_ALLOW, 
+									NODE_ACCESS_DENY, 
+									NODE_ACCESS_IGNORE
+
+									$op (operation conditions):
+										'create'
+										'view' -not good for view
+										'delete'
+										'update'
+
+									example: 
+
+									function mymodule_node_access($node, $op, $account) {
+										return NODE_ACCESS_DENY;
+									}
+
+									
+						hook_node_access_records_alter()
+						hook_node_grant_alter()
+						hook_query_alter()
+
+							allows you to ignore modules node_access records or grants.
+
+
+
+
+						The documentation talks about “realms” and “grant ids”. 
+						Instead, this API uses the concepts of Locks and Keys.
+						different colors (multiple modules).
+
+
+						1. Each lock Realm (color) must be opened to access the node
+						2. Only one ID (serial number) within the Realm needs to be unlocked to open that entire Realm.
+
+
+
+
+						ACCESS for VIEWS
+
+							The beauty of using the two Grant API hooks described above is that they are respected by Menus, Views, and optionally other queries within the database API. 
+
+
+
+
+
+
+				************** 
+				************** 
+				  USER ACCESS
+				************** 
+				************** 
+
+
+						user access and set local permissions withh user_access hooks
+
+						LIST OF PERMISSIONS
+							/people/permissions/
+								inspect element on checkbox
+									the value="<permission name>"
+
+							OR
+
+								// Render role/permission overview:
+								$options = array();
+								foreach (module_list(FALSE, FALSE, TRUE) as $module) {
+								  print_r($module);
+								  // Drupal 6
+								  // if ($permissions = module_invoke($module, 'perm')) {
+								  //  print_r($permissions);
+								  // }
+
+								  // Drupal 7
+								  if ($permissions = module_invoke($module, 'permission')) {
+								    print_r($permissions);
+								  }
+								}
+
+
+				************** 
+				************** 
+				  NODE ACCESS
+				************** 
+				************** 
+						if you want some roles to have update abilities to certain roles.
+						allows you to set permissions for CRUD for roles
+
+		**************
+		**************
+			JAVASCRIPT
+		**************
+		**************
+			JQUERY
+
+				http://api.jquery.com/jQuery.noConflict.
+
+				1. jQuery().ready(function() {
+					...
+					});
+
+				2. (function($) {
+						$().ready(function() {
+						...
+						});
+					})(jQuery);
+
+			Attaching JS files to Drupal 
+
+				In the .info file :
+					scripts[] = foo.js
+					stylesheets[screen][] = bar.css
+
+				drupal_add_js(). This utility function provides the ability to add files (both external to Drupal and within the file system
+
+				* also there is drupal_add_css()
+
+					1.
+						drupal_add_js('path/to/hello_world.js');
+						drupal_add_css('path/to/hello_world.css');
+
+					2. 
+						http://api.drupal.org/api/function/drupal_get_path/7
+
+						$path = drupal_get_path('module', 'hello_world');
+						drupal_add_js($path . '/hello_world.js');
+						drupal_add_css($path . '/hello_world.css');
+
+				The JavaScript groups:
+				 	JS_LIBRARY, 
+				 	JS_DEFAULT, 
+				 	JS_THEME. 
+				 Within each group files are sub-grouped by whether every_page is set to true.
+						
+						$path = drupal_get_path('module', 'hello_world');
+							$options = array(
+								'group' => JS_LIBRARY,
+								'cache' => FALSE,
+								'preprocess' => FALSE,
+								'defer' => TRUE,
+							);
+						drupal_add_js($path . '/mylibrary.js', $options);
+
+				The weight set for jquery.js is - 20
+				The weight for drupal.js is – 1.
+
+				The scope that a file can be added to is either the 'header' or 'footer'.
+
+				Defer is an option for the script tag in HTML, supported by Internet Explorer. It tells the browser that the script can defer execution until after the page has been rendered.
+
+				ADDING PHP to Javascript
+
+					$settings = array(
+						'helloWorld' => array(
+							'display' => 'alert',
+							'message' => 'Hello World!',
+						),
+					);
+
+					drupal_add_js($settings, 'setting');
+
+					In this example, the message is available at Drupal.settings.helloWorld.message
+
+
+				drupal_add_js('alert("Hello World!");', 'inline');
+
+				http://api.drupal.org/api/function/drupal_add_js/7
+
+			LIBRARY API
+
+				drupal_add_library('system', 'farbtastic');
+
+				http://api.drupal.org/api/function/drupal_add_library/7.
+
+				drupal_add_library('overlay', 'parent');
+
+					In the function overlay_library(), parent is set to have jQuery BBQ and jQuery UI core as dependencies to the overlay parent. This means those two libraries will be added to the page before the overlay.
+
+				Defining libraries with hooks
+
+					/**
+					* Implements hook_library().
+					*/
+					function hello_world_library() {
+						$path = drupal_get_path('module', 'hello_world');
+						$libraries = array();
+						$libraries['hello_world_library'] = array(
+							'title' => 'Hello World',
+							'website' => 'http://example.com',
+							'version' => '1.0',
+							'js' => array(
+								$path . '/hello_world.js' => array(),
+							),
+							'css' => array(
+								$path . '/hello_world.css' => array(),
+							),
+							'dependencies' => array(
+								array('system', 'ui.dialog'),
+							),
+						);
+						return $libraries;
+					}
+
+					drupal_add_library('hello_world', 'hello_world_library');
+
+					http://api.drupal.org/api/function/hook_library/7.
+
+				In the file hello_world_update.module we have the following implementation of hook_library_alter():
+
+					http://api.drupal.org/api/function/hook_library_alter/7
+				
+					/**
+					* Implements hook_library_alter().
+					*/
+					function hello_world_library_alter(&$libraries, $module) {
+						if ($module == 'hello_world' && isset($libraries['hello_world_library'])) {
+								// Verify existing version is older than the one we are
+								// updating to.
+							if (version_compare($libraries['hello_world_library']['version'], '2.0', '<')) {
+								// Update the existing Hello World to version 2.0.
+								$libraries['hello_world_library']['version'] = '2.0';
+								$libraries['hello_world_library']['js'] = array(
+								drupal_get_path('module', 'hello_world_update') . '/hello_world_2.0.js' => array(),
+								);
+							}
+						}
+					}
+
+				Adding JS to form inputs or fields with 
+
+
+
+
+
+		**************
+		**************
+			CSS
+		**************
+		**************
+
+				The options for CSS files are weight, group, every_page, media, basename, browsers, and preprocess.
+				
+				3 css groups:
+					CSS_SYSTEM is for system files and libraries
+					CSS_DEFAULT is the module CSS files should use
+					CSS_THEME comes after the other options and is used for theme CSS
+
+				CSS can render for 'screen' or 'media', and the default 'all'
+
+						$path = drupal_get_path('module', 'hello_world');
+						$options = array(
+							'group' => CSS_SYSTEM,
+							'media' => 'screen',
+							'preprocess' => FALSE,
+						);
+
+					drupal_add_css($path . '/hello_world.css', $options);
+
+
+					drupal_add_css("body { color: #ffffff; }", 'inline');
+
+					http://api.drupal.org/api/function/drupal_add_css/7
+
+
+		******************
+		******************
+		JAVASCRIPT CSS AND LIBRARIES
+		******************
+		******************
+
+			Using renderable arrays	( keys are js, css, library )
+
+
+				$form['options'] = array(
+					'#type' => 'textfield',
+					'#title' => t('Author name'),
+					'#maxlength' => 25,
+					'#attached' => array(
+						'css' => array(
+							drupal_get_path('module', 'hello_world') . '/example.css',
+						),
+						'js' => array(
+							"alert('Hello World!')" => array('type' => 'inline'),
+						),
+				);
+
+			Using hook_js_alter() & hook_css_alter()
+
+				http://api.drupal.org/api/function/hook_js_alter/7
+				http://api.drupal.org/api/function/hook_css_alter/7
+
+				CSS
+
+					/**
+					* Implements hook_css_alter().
+					*/
+					function example_css_alter(&$css) {
+						unset($css[drupal_get_path('module', 'system') . '/system.css']);
+					}
+
+		******************
+		******************
+			Drupal Variables
+		******************
+		******************
+			!symbol is inserted as is, with no modification.
+							$form['ajax_markup']['#markup'] = t("Hello !city", array('!city' => $form_state['values']['hello_city']));
+			@symbol value is passed through Drupal.checkPlain()
+				Drupal.theme.prototype.hello = function(text) {
+					return '<h2>' + Drupal.t('Hello @city', {'@city': text}) + '</h2>';
+				}
+			%symbol causes the variable to be passed through Drupal.checkPlain() and Drupal.theme('placeholder').
+
+
+		******************
+		******************
+			FILE API
+		******************
+		******************
+
+				3 types of file storage in drupal
+
+					public: available to the world at large
+					private: a directory outside of the drupal root that site developers control who has access
+					temporary: are used by drupal first written then when safe are moved to their final location
+
+				Securing your filesystem: http://drupal.org/node/344806
+				See these locations at admin/config/media/file-system
+
+				Full list of File API functions:
+					http://api.drupal.org/api/group/file/7
+
+				* In order to open files from remote locations, PHP must have the allow_url_fopen setting enabled in your php.ini.
+
+				ex. 1
+
+					$image = file_get_contents('http://drupal.org/files/issues/druplicon_2.png');
+					$file = file_save_data($image, 'public://druplicon.png',FILE_EXISTS_REPLACE);
+
+						file_save_data("1","2","3")
+							1. the string of data that file_get_contents creates
+							2. the location to save to with the wrapper, (public private temp) in front.
+							3. replacement action:
+								a. FILE_EXISTS_REPLACE: The new file should overwrite the existing file.
+								b. FILE_EXISTS_RENAME
+								c. FILE_EXISTS_ERROR: Don't do anything and just return FALSE.
+							The default option is FILE_EXISTS_RENAME
+
+
+				DrupalStreamWrapperInterface, refer to http://api.drupal.org/api/drupal/includes--stream_wrappers.inc/7
+
+				PHP info on streaming
+					http://us2.php.net/manual/en/intro.stream.php
+
+		******************
+		******************
+			IMAGE API
+		******************
+		******************
+
+				drupal 6: Imagefield and Imagcache
+				Drupal 7 Image API 
+
+					GD image management library?
+					It supports the ability to bring in ImageMagick library
+
+				Image function built into drupal:
+				
+				( http://api.drupal.org/api/group/image/7 )
+				
+					image_crop(): Crop an image to specified dimensions.
+					image_desaturate(): Convert an image to grayscale.
+					image_resize(): Resize an image to specified dimensions. This can affect the image's aspect ratio.
+					image_rotate(): Rotate an image to the specified number of degrees.
+					image_scale(): Resize an image to specified dimensions without affecting the image's aspect ratio.
+					image_scale_and_crop(): Combine scale and crop in one operation.
+
+				Image  effects
+
+					http://api.drupal.org/api/function/image_toolkit_invoke/7
+
+					hook_image_effect_info()
+
+					hook_image_default_styles()
+
+		****************
+		****************
+		INSTALLATION PROFILES
+		****************
+		****************
+
+			stored in the root directory under /profiles/
+
+			Steps to creating a profile:
+
+				1. create a directory in profiles/
+				2. create module adn theme folders
+
+					ex. structure
+
+						profiles/<your profile name>/
+							modules/ (place modules you need in this folder)
+							themes/ (place themes you need in this folder)
+							<your profile name>.info
+									name = Example Store
+									description = "An example <your profile name> installation profile."
+									version = VERSION
+									core = 7.x
+									files[] = <your profile name>.profile
+									files[] = <your profile name>.install.inc
+									files[] = <your profile name>.install
+
+									// modules and themes
+									dependencies[] = block
+									dependencies[] = comment
+									dependencies[] = contact
+									dependencies[] = contextual
+									dependencies[] = dashboard
+									dependencies[] = help
+									dependencies[] = image
+									dependencies[] = menu
+									dependencies[] = path
+									dependencies[] = taxonomy
+									dependencies[] = dblog
+									dependencies[] = search
+									dependencies[] = shortcut
+									dependencies[] = toolbar
+									dependencies[] = overlay
+									dependencies[] = field_ui
+									dependencies[] = file
+									dependencies[] = rdf
+							<your profile name>.profile
+
+			drupal.org bundled distrobutions:
+				http://drupal.org/node/642116.
+
+			see if module is installed and enabled
+				module_exists() see http://api.drupal.org/api/function/module_exists/7.
+
+			profile install task system hooks
+
+				1.	hook_install_tasks(): This allows the profile to add tasks at the end of the
+					default tasks
+				2.	hook_install_tasks_alter(): This allows the profile to alter all the tasks including those provided as defaults by the installer
+
+				3. hook_install()
+					http://api.drupal.org/api/function/hook_install/7.
+
+
+		****************
+		****************
+		DATABASE STUFF
+		****************
+		****************
+			// Fetch a single record as an object.
+			$record = $result->fetchObject();
+
+			// Fetch a single record as an array.
+			$record = $result->fetchAssoc();
+			
+			// Fetch just the first field of the next record.
+			$field = $result->fetchField();
+			
+			// Fetch the entire result set at once into an array.
+			$records = $result->fetchAll();
+
+			ex. query select
+
+				$query = db_select('node', 'n');
+				$query->fields('n', array('nid, title'));
+				$u_alias = $query->innerJoin('users' ,'u', '%alias.uid = n.uid');
+				// now select the fields
+				$query->addField($u_alias, 'name', 'username');
+				$query->condition("{$u_alias}.name", 'Bob');
+				$query->condition('n.created', REQUEST_TIME - 604800, '>=');
+				$query->orderBy('n.created', 'DESC');
+				$query->range(0, 5);
+				$query->addTag('node_access');
+				$result = $query->execute();
+
+						innerJoin()
+						leftJoin()
+						rightJoin()
+						join()
+
+						query_alter()
+							*******************************
+							There's one more important method to call—addTag(). This method doesn't
+							affect the query directly but does mark the type of query it is. If a query has been tagged then before it is turned into an SQL string it will be passed through
+							hook_query_alter() and hook_query_TAG_alter(). That allows other modules an opportunity to change the query if they need to. The node_access tag, used here, is most important as it allows the node access system to alter the query, to filter out nodes that the current user should not have access to.
+							*******************************
+			ex. query insert
+				
+				1. 
+
+				$id = db_insert('imports')
+				->fields(array(
+					'name' => 'Groucho',
+					'address' => '123 Casablanca Ave.',
+					'phone' => '555-1212',
+				))
+				->execute();
+
+				2. 
+
+				$values[] = array(
+					'name' => 'Groucho',
+					'address' => '123 Casablanca Ave.',
+					'phone' => '555-1212',
+				);
+				$values[] = array(
+					'name' => 'Chico',
+					'address' => '456 Races St.',
+					'phone' => '555-1234',
+				);
+				$values[] = array(
+					'name' => 'Harpo',
+					'address' => '789 Horn Ave.',
+					'phone' => '555-1234',
+				);
+				$values[] = array(
+					'name' => 'Zeppo',
+					'address' => '22 University Way',
+					'phone' => '555-3579',
+				);
+				$insert = db_insert('imports')->fields(array('name', 'address', 'phone' => '555-1212'));
+				foreach ($values as $value) {
+				$insert->values($value);
+				}
+				$insert->execute();
+			ex. query update
+
+				db_update('imports')
+				->condition('name', 'Chico')
+				->fields(array('address' => 'Go West St.'))
+				->execute();
+			ex. query delete
+
+				db_delete('imports')
+				->condition('name' => 'Zeppo')
+				->execute();
+			
+			A Merge query says, in essence, "If this record exists, update it with this query otherwise create it with this other query".
+			
+			ex. query merge
+
+					1. 
+					db_merge('variable')
+					->key(array('name' => $name))
+					->fields(array('value' => serialize($value)))
+					->execute();
+					2.
+					db_merge('people')
+						->key(array('job' => 'Speaker'))
+						->insertFields(array(
+							'age' => 31,
+							'name' => 'Meredith',
+						))
+						->updateFields(array(
+							
+							'name' => 'Tiffany',
+						))
+						->execute();
+
+			TRANSACTIONS
+				this is a cool feature because when we are running multiple queries at once if one breaks or fails we want it to cancel all the queries
+
+				ex. 
+
+					function my_function() {
+						$transaction = db_transaction();
+						try {
+							$id = db_insert('example')
+								->fields(array(
+								'field1' => 'mystring',
+								'field2' => 5,
+							))
+							->execute();
+							my_other_function($id);
+							return $id;
+						}
+						catch (Exception $e) {
+							$transaction->rollback();
+							watchdog_exception('type', $e);
+						}
+					}
+
+		*****************
+		*****************
+		SECURRRRRITY
+		*****************
+		*****************
+
+			http://drupal.org/security
+			
+				1. Always assume that incoming data is insecure until and unless it's been processed to ensure that it is safe.
+
+				2. FILTER and or ESCAPE YOUR DATA
+
+					a. filter_xss() will strip out all HTML tags except those in a specified list. The default list is reasonably safe.
+
+					b. filter_xss_admin() is the same as filter_xss(), but with a very permissive tag list. It is best used for text that we know will only be
+					entered by a trusted administrator.
+
+					c. check_markup() will filter a piece of text according to a specified set of filter rules, which are configured through the administrative UI as text formats.
+					
+					d. check_plain() takes a more sledgehammer approach to a piece of text. Rather than removing untrustworthy HTML tags, it escapes all HTML
+					tags so that they will appear literally in the browser. See below for more
+					on escaping.
+
+				3. SQL INJECTION
+					SQL injection from badly written queries is the most common, and the most easily avoidable, form of security vulnerability.
+
+				4. NODE ACCES CONTROL
+					See http://drupal.org/node/310077 for more details on how query tagging and query alteration work, and how some other common tags work
+
+
+
+During initialization, Drupal will connect to a database and retrieve certain configuration data. Later, as many of the core modules load, they too, contact the database to retrieve or update information. For most Drupal modules, the database
+is the location for data storage.
+
+***********
+
+
+The Drupal site has a manual on best practices (http://drupal.org/node/360052) that includes a section on coding standards (http://drupal.org/coding-standards). All Drupal developers abide by these standards.
+
+
+************
+
+DEVEL MODULE
+
+	Functions used for dumping objects and arrays into formatted Drupal output
+	Tools for analyzing database usage and performance
+	A theme tool which indicates (graphically) which elements of a page were themed by which functions or templates
+	A content generator for quickly populating your site with testing content
+
+
+		********************
+		********************
+			DEVEL SETTINGS
+		********************
+		********************
+
+				QUERY LOG - click to display query log on every page
+					- how many queries
+					- how long they took
+					- sort by source or duration
+					- highlight long queries
+
+		********************
+		********************
+			DEVEL COMMANDS
+		********************
+		********************
+
+				/**************************************************/
+				devel/reference   (list of functions that generated this page )
+				/**************************************************/
+
+				dpm($input, $name = NULL) - devel print variable 
+					-	no krumo dpr($input, $return = FALSE, $name = NULL) - devel print pretty in the header
+				dvm($input, $name = NULL) - devel var dump
+					- no krumo dvr($input, $return = FALSE, $name = NULL)
+
+					kpr() - prints the variable to the browser using krumo
+
+					dargs()
+						prints the arguments passed into the current function
+
+					dd() - logs any variable to the temp/"drupal_debug.txt"
+					db_queryd($query, $args - array())
+
+
+					firep($item, $optional_title) this is cool
+
+						Drupal for Firebug
+
+						All the examples in this section assume that you are running a recent version of Firefox with the Firebug add-on.
+
+						Please note that Drupal for Firebug doesn’t seem to work with the Theme developer module from the Devel package.
+
+						Installation
+						Install the Drupal for Firebug module
+						Install the DrupalForFirebug Firefox add-on. You can find a link to the current version on the Drupal for Firebug project page.
+						When you have installed the Firefox add-on, go to Administer → Build → Modules and enable the two Drupal for Firebug modules.
+
+						In use
+						Once you have installed the add-on and enabled the modules, a new Drupal tab becomes available in Firebug. The following sections describe each subtab.
+
+
+*****************
+
+CODER MODULE 
+
+	It can examine code for compliance against the Drupal coding standards
+	It can automatically convert modules from one version of Drupal to another: http://drupal.org/project/coder
+
+
+
+
+*****************************8
+*****************************8
+
+	XDEBUG
+
+*****************************8
+*****************************8
+
+		INSTALL:
+			Sublime Text:	ctrl+shift+p
+			Package Control: insatall package
+			Package: xdebug client
+
+			APACHE SETUP:
+				
+				****************************
+				VERSION 1
+				****************************
+					C:\wamp\bin\apache\apache2.4.9\bin
+
+					zend_extension = "c:/wamp/bin/php/php5.5.12/zend_ext/php_xdebug-2.2.5-5.5-vc11-x86_64.dll"
+
+					[xdebug]
+					xdebug.idekey="hado"
+					xdebug.remote_enable=On
+					xdebug.var_display_max_children = 999
+					xdebug.var_display_max_data = 99999
+					xdebug.var_display_max_depth = 100
+					xdebug.remote_host="localhost"
+					xdebug.remote_port=9000
+					xdebug.remote_handler="dbgp"
+					xdebug.remote_log="/tmp/xdebug.log
+
+			Project -> save project as -> arbitrary name.
+
+			open the arbitrary name.sublime-project
+
+					{
+						"folders":
+						[
+							{
+								"path": "/C/wamp/www"
+							}
+						],
+
+						"settings": {
+							"xdebug": { "url": "http://ventana" } < the url is the root to that site where .sublime-project is>
+						}
+					}
+
+				************************
+				VERSION 2
+				************************
+
+					C:\wamp\bin\apache\apache2.4.9\bin
+
+						; XDEBUG Extension
+						zend_extension = "c:/wamp/bin/php/php5.5.12/zend_ext/php_xdebug-2.2.5-5.5-vc11-x86_64.dll"
+
+
+
+						[xdebug]
+						xdebug.default_enable = 1
+						xdebug.remote_autostart = 0
+						xdebug.remote_connect_back = 1
+						xdebug.remote_enable = 1
+						xdebug.remote_handler = dbgp
+						;xdebug.remote_port = 9000
+						xdebug.remote_host = 127.0.0.1
+
+					Sublime->preferences->package settings->xdebug->settings
+
+						"url": "http://scratch/", <- vhost directory
+						"ide_key": "sublime.xdebug",
+
+
+					In browser go to directory
+
+						http://vhost/ ?XDEBUG_SESSION_START=sublime.xdebug
+
+			Sublime commands
+
+				Tools -> Xdebug -> 
+
+					Start debugging -> Shift+F8
+					Stop debugging -> Ctrl + Shift + F10
+					Step over -> Ctrl+Shift+F6
+					Step into -> Ctrl+Shift+F7
+					Step out from -> Ctrl+Shift+F8 
+					Continue (until next breakpoint) -> Ctrl+Shift+F5 
+
+
+
+
+			***********************************
+			note that i heard xdebug wont work with multiple folders open
+			***********************************
+
+
+
+**************************
+**************************
+debug
+**************************
+**************************
+
+	ddebug_backtrace();
+
+
+
+	/* Drupal rebuild Permissions */
+
+	admin/reports/status/rebuild
+
+
+	/* VIEWS CACHE */
+
+	admin/structure/views/settings/advanced
