@@ -1,0 +1,352 @@
+Ubuntu commands
+
+lbs_release -a (what version of ubuntu you are runnning)
+
+sudo -i  , sudo passwd root   ( Root account (i.e. set a password) )
+
+xdg-open ( open files )
+
+chmod 644 myDoc.txt ( file permissions )
+
+chown username:username myDoc.txt ( file ownership )
+
+Installing the LAMP Web Server
+	
+	VIRTUAL HOSTS = https://www.youtube.com/watch?v=2vA2Yzv-NoI
+
+	http://www.youtube.com/watch?v=wrZQDYa-9NM
+	
+	sudo apt-get install apache2 apache2-utils php5 mysql-server php5-mysql libapache2-mod-auth-mysql
+
+	sudo mysql_install_db
+
+	################################
+
+	# /etc/init.d/mysql start
+	
+	##################################
+
+	sudo apt-get install php-pear php5-gd php5-mcrypt php5-curl
+	
+
+	Install phpmyadmin
+		sudo apt-get install phpmyadmin
+
+	To set up under Apache all you need to do is include the following line in /etc/apache2/apache2.conf.
+
+		Include /etc/phpmyadmin/apache.conf
+
+
+	sudo service apache2 restart
+
+
+	1. LAMP ENABLE MOD_REWRITE
+
+		sudo a2enmod rewrite && sudo service apache2 restart
+		With explanations -- do the following in your terminal:
+
+		ls -l /etc/apache2/mods-available/rewrite.load    ///if it prints out rewrite.load, it's there and ready to go
+
+		sudo a2enmod rewrite   //enables the mod
+
+		ls -l /etc/apache2/mods-enabled/rewrite.load // shows created symlink
+
+		sudo vi /etc/apache2/sites-available/default   //opens the file in vi (you can also use vim or nano)
+		Replace occurrences of "AllowOverride None" with "AllowOverride all" as necessary
+
+		sudo service apache2 restart    ///restarts apache
+		Edit your virtual host entry in /etc/apache2/sites-available and add AllowOverride All to the DocumentRoot. Your virtual host should ultimately look something like this:
+
+		<VirtualHost *:80>
+		  ServerName example.com
+		  DocumentRoot /var/www/vhosts/example.com
+		  <Directory /var/www/vhosts/example.com>
+		    AllowOverride all
+		  </Directory>
+		</VirtualHost>
+
+
+Open files with Sublime text
+	subl --help
+	subl -n /etc/foldername/
+
+
+rm -rf <directory name> ( remove directory and its contents )
+
+cp -R SRCFOLDER DESTFOLDER/ ( copy folder )
+cp -a SRCFOLDER/. DESTFOLDER/ ( copy folder contents )
+cp  SRCFILE DESTFILE/ ( copy file )
+
+
+wget http://.com/dede.jpg (download image to directory)
+
+tar -zxvf data.tar.gz ( extract tar.gz)
+
+mv -v file1 file2 ( move or rename )
+
+
+
+INSTALLING SKYPE
+
+	Step 1: Remove previous version.
+
+		sudo apt-get remove skype skype-bin:i386 skype:i386
+		sudo apt-get install sni-qt:i386
+
+	It is Important if you installed older version of Skype on your Ubuntu, Clear the old Skype folder before installing latest version. Then clear that by using:
+
+		rm -rf ~/.Skype
+
+	Step 2: Preparing to Installing Skype.
+	Users of 64-bit Ubuntu, should enable MultiArch if it isn't already enabled by running the command
+
+		sudo dpkg --add-architecture i386
+		Update repositories and "updates" list:
+
+		sudo apt-get update
+		sudo apt-get install gdebi #(read Why you need to install gdebi...)
+	
+	Step 3: Installing Skype
+	Method 1: Download and install from file
+
+		wget download.skype.com/linux/skype-ubuntu-precise_4.3.0.37-1_i386.deb
+
+		sudo gdebi skype-ubuntu-precise_4.3.0.37-1_i386.deb
+
+
+
+
+PERMISSIONS READ AND WRITE AND EXECUTE PERMISSIONS
+
+			sudo chmod -R ugo+rw /DATA/SHARE
+			The breakdown of the above command looks like:
+
+			sudo – this is used to gain admin rights for the command on any system that makes use of sudo (otherwise you'd have to 'su' to root and run the above command without 'sudo')
+
+			chmod – the command to modify permissions
+
+			-R – this modifies the permission of the parent folder and the child objects within
+
+			ugo+rw – this gives User, Group, and Other read and write access.
+
+			ugo-w - this removes permissions
+
+			ls -lha  -this lists all the permissions for folder contents
+
+			As you can probably surmise, this command opens wide the SHARE folder such that anyone on the system can have access to that folder. As I mentioned earlier, a more secure method would be to use groups. But we're just using this for the purpose of demonstration.
+
+			The breakdown of permissions looks like this:
+
+			u – user
+
+			g – group
+
+			o – other
+
+			The 'other' entry is the dangerous one, as it effectively gives everyone permission for the folder/file. The permissions you can give to a file or folder are:
+
+			r – read
+
+			w – write
+
+			x – execute
+
+VIM EDITOR COMMANDS
+
+	http://www.radford.edu/~mhtay/CPSC120/VIM_Editor_Commands.htm
+
+	x to delete 
+	esc to exit out of current screen
+	:wq to quit
+	i to insert
+	
+
+RUBY AND RAILS
+
+	http://railsapps.github.io/installrubyonrails-ubuntu.html
+
+SASS
+
+	MAKE SURE YOU ARE LOGGED IN AS ROOT USER
+	ROOT USER
+	ROOT USER
+
+	gem install sass
+	sass -v
+	scss -t compressed path/to/input.scss path/to/output.css
+
+	SUBLIME TEXT
+
+		packages:
+			ctrl shift P
+				package install
+					SASS build
+					SublimeOnSaveBuild
+			right click folder and SASS build
+				in the config file set file path, and set it to compressed
+			now when you save it should update
+
+LESS
+	npm install -g less
+	sublime plugin package less2css
+	now when you save a .less file is creates a .css file
+
+
+NODE.js
+
+	CMS 
+	http://hatchjs.com/
+	http://keystonejs.com/getting-started/
+
+	sudo apt-get update
+	sudo apt-get install nodejs
+	sudo apt-get install npm
+	npm install -g express
+
+	sudo express --ejs <project name>
+	cd <project name>
+	npm install
+	npm start OR ./bin/www app (starts app)
+
+	MONGODB
+
+		centos
+		http://www.liquidweb.com/kb/how-to-install-mongodb-on-centos-6/
+
+		curl -O http://downloads.mongodb.org/linux/mongodb-linux-i686-2.6.4.tgz
+		tar -zxvf mongodb-linux-i686-2.6.4.tgz
+		mkdir -p mongodb
+		cp -R -n mongodb-linux-i686-2.6.4/ mongodb
+		((
+			Ensure the location of the binaries is in the PATH variable.
+			The MongoDB binaries are in the bin/ directory of the archive. To ensure that the binaries are in your PATH, you can modify your PATH.
+
+			For example, you can add the following line to your shell’s rc file (e.g. ~/.bashrc):
+
+			export PATH=<mongodb-install-directory>/bin:$PATH
+		))
+		mkdir -p /data/db
+		Set permissions for the data directory.
+		mongod (start mongo server)
+
+		ps -ef | grep mongo (shows current mongo server running?)
+			example:
+				mongodb   1307  1  0 02:27 ?        00:00:01 /usr/bin/mongod --config /etc/mongodb.conf
+
+		mongo (enter mongo shell)
+
+			show dbs                    #show database names
+			show collections          #show collections in current database
+			show users                 # show users in current database
+			show profile                # show most recent system.profile entries with time >= 1ms
+			show logs                   # show the accessible logger names
+			show log [name]          # prints out the last segment of log in memory, 'global' is default
+			use <db_name>          #  set current database
+			db.foo.find()                # list objects in collection foo
+			db.foo.find( { a : 1 } )    #list objects in foo where a == 1
+			it                                #result of the last line evaluated; use to further iterate
+			exit                            #quit the mongo shell
+
+			https://www.digitalocean.com/community/tutorials/how-to-connect-node-js-to-a-mongodb-database-on-a-vps
+
+			
+
+
+LAMP VIRTUAL HOSTS
+
+	https://www.drupal.org/node/134439
+	http://www.youtube.com/watch?v=AgH3q-1-wwU
+
+	/etc/hosts
+		127.0.0.1 site1.com
+
+	mkdir /var/www/site1.com/index.html
+
+	/etc/apache2/sites-available/site1.com.conf
+
+	<VirtualHost *:80>
+		DocumantRoot /var/www/site1.com
+		ServerName www.site1.com
+		ServerAlias site1.com
+	</VirtualHost>
+
+	sudo a2ensite site1.com
+
+	sudo service apache2 restart
+
+	
+7 ZIP
+	
+	7z x *.zip -o\folder
+
+
+GIT
+
+	GIT SERVER
+
+		The idea here is that git server will store all the directories, branches, and nonsense.
+		On the server will be the working directory that the user will pull from the server directory as they do on a local machine. Basically the git server is replacing github
+
+		prerequisite 
+			- have the ability to SSH into your directory
+
+		local
+			- git init
+			- git add . 
+			- git commit -m "my commit"
+			- git add -u . (marks deleted items)
+
+		server
+			(main acount folder/foldername.git)
+				- git init --bare --shared
+
+		local
+			- git remote add <remote-name> user@website.com:~/directory you setup/endingwith.git
+			- git remote set-url <remote-name> user@website.com:~/directory you setup/endingwith.git 
+			- git push <remote-name> master
+			- git push <remote-name> <branch name>
+
+			- git pull <remote-name> <branch name>
+
+	git log
+	git remote (add remove)
+	git status
+
+
+
+SSH KEYS ?
+
+	http://blog.arvixe.com/how-to-install-node-js-on-your-shared-account/comment-page-1/
+	
+	1. ssh-keygen
+	2. overwrite?
+	3. passphrase?
+	4. confirm passphrase?
+	5. ssh-copy-id root@afelloprint.com
+		a. password
+
+	6. now logi in
+		ssh root@afelloprint.com
+	7. disable password
+
+		cd /etc/ssh/
+		ls -l
+		vim sshd_config 
+		/PasswordAuthentication no
+
+	8. reload sshd server
+		/etc/init.d/ssh restart
+		cd .ssh/
+		ls
+		cat authorized_keys
+
+
+
+SCP COMMAND
+
+	dude it's as easy as:
+
+		scp <file name> <ssh directory> (copy file)
+		scp -r ./<folder>/* <ssh directory> (copy folder contents)
+
+		
