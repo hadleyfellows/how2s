@@ -1,0 +1,1708 @@
+
+https://www.youtube.com/playlist?list=PLEsfXFp6DpzT5veidCTZ1mQriBX0Mu2LF
+
+https://www.youtube.com/playlist?list=PLxxA5z-8B2xk4szCgFmgonNcCboyNneMD
+
+http://www.tangowithdjango.com/book/index.html
+
+
+INSTALLATION
+
+START PROJECT
+	
+	INITIATE
+
+		1. run "django-admin.py startproject <project name>" in root directory
+		2. (sqllite3 "touch storage.db") and "cd .. && subl"
+		3. settings.py :
+			a. DATABASES = {
+			'ENGINE' : 'django.db.backends.sqlite3',
+			'NAME' : 'location.you.want.storeit.storage.db',
+
+			b. TIME_ZONE = 'America/Los_angeles'
+			c. LANGUAGE_CODE = 'en-us'
+
+		4. tes: "python manage.py runserver"
+
+	APPS APPS
+
+		1. MODELS MODELS MODELS 
+			Apps are like modules or packages
+			example: App Article
+
+				a. python manage.py startapp article
+				b. cd article
+					1. touch __init__.py
+				c. settings.py:
+					INSTALLED_APPS = (
+					    'django.contrib.admin',
+					    'django.contrib.auth',
+					    'django.contrib.contenttypes',
+					    'django.contrib.sessions',
+					    'django.contrib.messages',
+					    'django.contrib.staticfiles',
+					    'article',
+					) 
+				d. article/models.py:
+					from django.db import models
+
+					class Article(models.Model):
+						title = models.CharField(max_length=200)
+					#*django model types*
+					body = models.TextField()
+					#* text area no restrictions*
+					pub_date = models.DateTimeField('date published')
+					likes = models.IntegerField()
+
+					# this is for shell scripting
+					def __unicode__(self):
+						return self.title
+
+				e. python manage.py makemigrations
+				f. python manage.py migrate
+				f. python manage.py sqlmigrate <app name> <migration name>
+				f. DELETE "python manage.py sqlflush <app name>"
+				g. python manage.py syncdb
+
+				h. ENTER SHELL
+					python manage.py shell
+
+					from django.utils import timezone
+					from article.models import Article
+
+					a = Article(title="title1", body="body of article", pub_date=timezone.now(),likes=0)
+					a.save()
+					a.id
+					Article.objects.all()
+
+		2. VIEWS VIEWS VIEWS
+
+			a. project3/article/views.py
+				from django.http import HttpResponse
+
+				def hello(request):
+					name="Hadley"
+					html = "<html><body><p>Hi my name is %s. Happy to see you</p></body></html>" % name
+					return HttpResponse(html)
+			b. project3/project3/urls.py
+				from django.conf.urls import patterns, include, url
+				from django.contrib import admin
+
+				urlpatterns = patterns('',
+				    # Examples:
+				    # url(r'^$', 'project3Youtube.views.home', name='home'),
+				    # url(r'^blog/', include('blog.urls')),
+
+				    url(r'^admin/', include(admin.site.urls)),
+				    url(r'^hello/', 'article.views.hello'),
+				)
+
+		3. TEMPLATES 
+			project3/project3/templates/
+
+			a. project3/
+				"mkdir templates"
+			b. project3/project3/settings.py
+				TEMPLATE_DIRS =(
+					'templates',
+				)
+			c. project3/article/views.py
+				from django.http import HttpResponse
+				from django.template.loader import get_template 
+				from django.template import Context
+
+				def hello(request):
+					name="Hadley"
+					html = "<html><body><p>Hi my name is %s. Happy to see you</p></body></html>" % name
+					return HttpResponse(html)
+
+				def hello_template(request):
+					name="Hadley"
+					t = get_template('hello.html')
+					html = t.render(Context('name':name))
+					return HttpResponse(html)
+			d. project3/templates/hello.html
+				<!DOCTYPE html>
+					<html>
+					<head>
+						<title>Welcome {{name}}</title>
+					</head>
+					<body>
+					<h1> Welcome {{name}}!</h1>
+					</body>
+					</html>
+			e. project3/project3/urls.py
+				from django.conf.urls import patterns, include, url
+				from django.contrib import admin
+
+				urlpatterns = patterns('',
+				    # Examples:
+				    # url(r'^$', 'project3Youtube.views.home', name='home'),
+				    # url(r'^blog/', include('blog.urls')),
+
+				    url(r'^admin/', include(admin.site.urls)),
+				    url(r'^hello/', 'article.views.hello'),
+				    url(r'^hello_template/', 'article.views.hello_template'),
+				)
+
+		4. CLASS BASED TEMPLATES
+			a. project3/article/views.py
+				# from django.shortcuts import render
+				from django.http import HttpResponse
+				from django.template.loader import get_template 
+				from django.shortcuts import render_to_response
+				from django.template import Context
+				from django.views.generic.base import TemplateView
+
+
+				def hello(request):
+					name="Hadley"
+					html = "<html><body><p>Hi my name is %s. Happy to see you</p></body></html>" % name
+					return HttpResponse(html)
+
+				def hello_template(request):
+					name="Hadley"
+					t = get_template('hello.html')
+					html = t.render(Context({'name':name}))
+					return HttpResponse(html)
+
+				def hello_template_simple(request):
+					name="Hadley"
+					return render_to_response('hello.html', {'name':name})
+
+				class HelloTemplate(TemplateView):
+
+					template_name = 'hello_class.html'
+
+					def get_context_data(self, **kwargs):
+						context = super(HelloTemplate, self).get_context_data(**kwargs)
+						context['name'] = 'Hadley'
+						return context
+			b. project3/project3/urls.py
+				from django.conf.urls import patterns, include, url
+				from django.contrib import admin
+				from article.views import HelloTemplate
+
+				urlpatterns = patterns('',
+				    # Examples:
+				    # url(r'^$', 'project3Youtube.views.home', name='home'),
+				    # url(r'^blog/', include('blog.urls')),
+
+				    url(r'^admin/', include(admin.site.urls)),
+				    url(r'^hello/$', 'article.views.hello'),
+				    url(r'^hello_template/$', 'article.views.hello_template'),
+				    url(r'^hello_template_simple/$', 'article.views.hello_template_simple'),
+				    url(r'^hello_class_view/$', HelloTemplate.as_view()),
+				)
+			c. project3/templates/hello_class.html
+				<!DOCTYPE html>
+				<html>
+				<head>
+					<title>Welcome {{name}}</title>
+				</head>
+				<body>
+				<h1> Welcome {{name}}!</h1>
+				<p>This is a class based template!!!!</p>
+				</body>
+				</html>
+
+		5. ADVANCED TEMPLATES
+			a. project3/article/views.py
+				# from django.shortcuts import render
+				from django.http import HttpResponse
+				from django.template.loader import get_template 
+				from django.shortcuts import render_to_response
+				from django.template import Context
+				from django.views.generic.base import TemplateView
+				from article.models import Article
+
+				def articles(request):
+					return render_to_response('articles.html',
+											 {'articles': Article.object.all() })
+
+
+				def article(request,article_id=1):
+					return render_to_response('article.html',
+											 {'article': Article.object.get(id=article_id) })
+			b. project3/project3/urls.py
+				from django.conf.urls import patterns, include, url
+				from django.contrib import admin
+				from article.views import HelloTemplate
+
+				urlpatterns = patterns('',
+				    # Examples:
+				    # url(r'^$', 'project3Youtube.views.home', name='home'),
+				    # url(r'^blog/', include('blog.urls')),
+
+				    url(r'^admin/', include(admin.site.urls)),
+				    (r'^articles/', include('article.urls')),
+				    url(r'^hello/$', 'article.views.hello'),
+				    url(r'^hello_template/$', 'article.views.hello_template'),
+				    url(r'^hello_template_simple/$', 'article.views.hello_template_simple'),
+				    url(r'^hello_class_view/$', HelloTemplate.as_view()),
+				)
+			c. project3/article/urls.py
+				from django.conf.urls import patterns, include, url
+
+				urlpatterns = patterns('',
+					url(r'^all/$', 'article.views.articles'),
+					url(r'^get/(?P<article_id>\d+)/$', 'article.views.article'),
+				)
+			d. project3/templates/articles.html
+				<!DOCTYPE html>
+				<html>
+				<head>
+					<title>Articles</title>
+				</head>
+				<body>
+
+				{% for article in articles %}
+					<h1>Title: <a href="/articles/get/{{article.id}}/"> {{ article.title }}</a></h1>
+					<p>Body: </p>
+					<p>{{ article.body }}</p>
+				{% endofor %}
+				</body>
+				</html>
+			e. project3/templates/article.html
+				<!DOCTYPE html>
+				<html>
+				<head>
+					<title>{{ article.title }}</title>
+				</head>
+				<body>
+
+				<h1>Title: {{ article.title }}</h1>
+				<p>Body: </p>
+				<p>{{ article.body }}</p>
+
+				<p>------------------------</p>
+				</body>
+				</html>
+
+		6. ADMIN INTERFACE ADMIN INTERFACE
+
+			a. settings.py
+				INSTALLED_APPS = (
+				    'django.contrib.admin',
+				    'django.contrib.auth',
+				    'django.contrib.contenttypes',
+				    'django.contrib.sessions',
+				    'django.contrib.messages',
+				    'django.contrib.staticfiles',
+				    'article',
+				)
+			b. project3/project3/urls
+				from django.conf.urls import patterns, include, url
+				from django.contrib import admin
+				from article.views import HelloTemplate
+				admin.autodiscover()
+
+				urlpatterns = patterns('',
+				    # Examples:
+				    # url(r'^$', 'project3Youtube.views.home', name='home'),
+				    # url(r'^blog/', include('blog.urls')),
+
+				    url(r'^admin/', include(admin.site.urls)),
+				    (r'^articles/', include('article.urls')),
+				    url(r'^hello/$', 'article.views.hello'),
+				    url(r'^hello_template/$', 'article.views.hello_template'),
+				    url(r'^hello_template_simple/$', 'article.views.hello_template_simple'),
+				    url(r'^hello_class_view/$', HelloTemplate.as_view()),
+				)
+			c. project3/article/admin.py
+				from django.contrib import admin
+				from article.models import Article
+
+				admin.site.register(Article)
+			d. localhost:8000/admin/
+				login: root
+				pass: hado6969
+
+		7. ADVANCED TEMPLATES FOR APPS
+
+			a. create templates folder in apps folder
+				ie. project3/article/templates/
+
+			b. settings.py
+				
+				TEMPLATE_DIRS =(
+                    'templates',
+                    #'article/templates',
+                )
+
+            c. project3/templates/base.html
+            	<!DOCTYPE html>
+				<html>
+				<head>
+					<title>{% block title %}Base.html{% endblock %}</title>
+					<style type="text/css">
+					#header { background: green; color: white; }
+					#wrapper{ width:800px; display: block;}
+					#sidebar{ width: 200px; display: inline-block;  vertical-align: top;}
+					#content{ width: 500px; display: inline-block; vertical-align: top;}
+					</style>
+				</head>
+				<body>
+					<div id="header">
+						<p>Header Time</p>
+					</div>
+					<div id="wrapper">
+						<div id="sidebar">
+						{% block sidebar %}
+							<ul>
+								<li>first link</li>
+								<li>second link</li>
+								<li>third link</li>
+							</ul>
+						{% endblock %}
+						</div>
+						<div id="content">
+						{% block content%}
+							<p>Hello bloody content!</p>
+
+						{% endblock %}
+						</div>
+					</div>
+					<div id="footer">
+					{% block footer %}
+							<p>This is the footer son.</p>
+					{% endblock %}
+					</div>
+				</body>
+				</html>
+            d. project3/templates/articles.html
+            	{% extends 'base.html' %}
+				<!DOCTYPE html>
+
+				<html>
+				<head>
+					<title>{% block title %}Articles in Apps folder{% endblock %}</title>
+				</head>
+				<body>
+				<h1>Articles in Apps folder</h1>
+				{% block content %}
+					{% if articles.count > 0 %}
+						{% for article in articles %}
+							<h1>Title: <a href="/articles/get/{{article.id}}/"> {{ article.title|upper }}</a></h1>
+							<p>Body: </p>
+							<p>{{ article.body|lower|truncatewords:"3" }}</p>
+						{% endfor %}
+					{% else %}
+						<p>no records to show</p>
+					{% endif %}
+				{% endblock %}
+				</body>
+				</html>
+
+		8. STATIC FILES
+			1. mkdir static
+				a. mkdir media static_dirs static_root
+				
+				b. static_dirs
+					FILES COMING FROM THIS DIRECTORY
+					1. mkdir img, css, js
+				c. static_root
+					FILES GOING TO THIS DIRECTORY AND SERVED UP
+
+			2. touch default.css and add images
+
+			3. settings.py
+
+				STATIC_URL = '/static/'
+
+				# STATIC_ROOT = '/home/django_unchained/project3Youtube/static/static_root/'
+				STATIC_ROOT = os.path.join(BASE_DIR, 'static', 'static_root')
+
+				STATICFILES_DIRS = (
+				    os.path.join(BASE_DIR, 'static', 'static_dirs'),
+				    # '/home/django_unchained/project3Youtube/static/static_dirs/',
+				)
+				MEDIA_ROOT = os.path.join(BASE_DIR, 'static', 'media')
+				MEDIA_URL = '/media/' 
+
+			4.	python manage.py collectstatic
+				this collects all the files from STATIC_DIR and sets them in STATIC_ROOT
+
+			5. base.html
+					<!DOCTYPE html>
+				a.	{% load staticfiles %}
+				b. <link type="text/css" href="{% static 'css/default.css' %}"  rel="stylesheet" >
+				c. <img src="{% static 'img/django.jpg' %}">
+			
+		9. SESSIONS AND COOKIES
+
+			COOKIES
+
+			a. settings.py
+				MIDDLEWARE_CLASSES = (
+    				'django.contrib.sessions.middleware.SessionMiddleware',	
+    		b. project3/article/views.py
+    			from django.http import HttpResponse
+				from django.template.loader import get_template 
+				from django.shortcuts import render_to_response
+				from django.template import Context
+				from django.views.generic.base import TemplateView
+				from article.models import Article
+
+
+
+				def articles(request):
+					language = 'en-us'
+					session_language = 'en-us'
+
+					if 'lang' in request.COOKIES:
+						language = request.COOKIES['lang']
+
+					return render_to_response('articles.html',
+											 {'articles': Article.objects.all(),
+											  'language' : language })
+
+
+				def article(request,article_id=1):
+					return render_to_response('article.html',
+											 {'article': Article.objects.get(id=article_id) })
+				def language(request, language='en-us'):
+					response = HttpResponse("setting language %s" % language)
+
+					response.set_cookie('lang', language)
+					return response	
+
+			c. project3/article/urls.py
+				1. 	url(r'^language/(?P<language>[a-z\-]+)/$', 'article.views.language'),
+			d. project3/article/templates/articles.html
+				<h2>Language is {{ language }}</h2>
+
+			SESSIONS
+
+			a. project3/article/views.py
+
+				def articles(request):
+					language = 'en-us'
+					session_language = 'en-us'
+
+					if 'lang' in request.COOKIES:
+						language = request.COOKIES['lang']
+
+					if 'lang' in request.session:
+						session_language = request.session['lang']
+
+					return render_to_response('articles.html',
+											 {'articles': Article.objects.all(),
+											  'language' : language, })
+											  'sess_language' : session_language })
+
+
+				def article(request,article_id=1):
+					return render_to_response('article.html',
+											 {'article': Article.objects.get(id=article_id) })
+				def language(request, language='en-us'):
+					response = HttpResponse("setting language %s" % language)
+
+					response.set_cookie('lang', language)
+					request.session['lang'] = language
+					return response
+
+			b. project3/article/template/articles/html
+
+				1. <h2>Session Language is {{ sess_language }}</h2>
+
+		10. USER LOGIN LOGOUT
+
+			a. project3/project3/settings.py
+				INSTALLED_APPS = (
+				    'django.contrib.auth',
+				)
+
+				MIDDLEWARE_CLASSES = (
+				    'django.contrib.auth.middleware.AuthenticationMiddleware',
+				    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+
+			b. project3/project3/urls.py
+
+			    # Login and Logout stuff
+			    url(r'^accounts/login/$', 'django_test.views.login'),
+			    url(r'^accounts/auth/$', 'django_test.views.auth_view'),
+			    url(r'^accounts/logout/$', 'django_test.views.logout'),
+			    url(r'^accounts/loggedin/$', 'django_test.views.loggedin'),
+			    url(r'^accounts/invalid/$', 'django_test.views.invalid_login'),
+
+			c. project3/templates/login.html
+
+				{% extends 'base.html' %}
+
+				{% block content %}
+					{% if form.errors %}
+						<p class="error">Sorry, that's not a valid username or password.</p>
+					{% endif %}
+					<form action="/accounts/auth" method="post">{% csrf_token %}
+						<label for="username">User Name:</label>
+							<input type="text" name="username" value="" id="username" />		
+						<label for="password">Password:</label>		
+							<input type="password" name="password" value="" id="password" />
+						<input type="submit" value="login" />
+					</form>
+					}
+				{% endblock %}
+
+			d. project3/templates/loggedin.html
+				{% extends 'base.html' %}
+
+				{% block content %}
+					<h2>Hi {{full_name}} you are now logged in.</h2>
+					<p>Click <a href="/accounts/logout/">here</a> to logout.</p>
+				{% endblock %}
+
+			e. project3/templates/invalid_login.html
+
+				{% extends 'base.html' %}
+
+				{% block content %}
+					<h2>Your login details are invalid!</h2>
+					<p>Click <a href="/accounts/login/">here</a> to login again.</p>
+				{% endblock %}
+
+			f. project3/project3/views.py
+				from django.shortcuts import render_to_response
+				from django.http import HttpResponseRedirect
+				from django.contrib import auth
+				from django.core.context_processors import csrf
+
+				def login(request):
+					c = {}
+					c.update(csrf(request))
+					return render_to_response('login.html', c)
+
+				def auth_view(request):
+					username = request.POST.get('username', '')
+					password = request.POST.get('password', '')
+					user = auth.authenticate(username=username, password=password)
+
+					if user is not None:
+						auth.login(request, user)
+						return HttpResponseRedirect('/accounts/loggedin')
+					else:
+						return HttpResponseRedirect('/accounts/invalid')
+
+				def loggedin(request):
+					return render_to_response('loggedin.html',
+											  {'full_name' : request.user.username})
+
+				def invalid_login(request):
+					return render_to_response('invalid_login.html')
+
+				def logout(request):
+						auth.logout(request)
+						return render_to_response('logout.html')
+
+			e. python manage.py syncdb
+
+			f. 
+
+		11. REGISTRATION
+
+			a. project3/project3/urls.py
+				url(r'^accounts/register/$', 'project3Youtube.views.register_user'),
+				url(r'^accounts/register_success/$', 'project3Youtube.views.register_success'),
+
+			b. project3/project3/views.py
+				from django.contrib import auth
+				from django.contrib.auth.forms import UserCreationForm
+
+				def register_user(request):
+					if request.method == 'POST':
+						form = UserCreationForm(request.POST)
+						if form.is_valid():
+							form.save()
+							return HttpResponseRedirect('/accounts/register_success')
+					
+					args ={}
+					args.update(csrf(request))
+
+					args['form'] = UserCreationForm()
+					print args
+					return render_to_response('register.html', args)
+
+				def register_success(request):
+					return render_to_response('register_success.html')
+
+
+
+			c. register.html
+
+				{% extends 'base.html' %}
+
+				{% block content %}
+					<form action="/accounts/register/" method="post">
+						{% csrf_token %}
+						{{form}}
+						<input type="submit" value="Register" />
+					</form>	
+				{% endblock %}
+
+			d. register_success.html
+
+				{% extends 'base.html' %}
+
+				{% block content %}
+					<p>You have registered!</p>
+					<p>Click <a href="/accounts.login/">here</a> to login in.</p>
+				{% endblock %}
+
+		12. EXTEND USER REGISTRATION FORM
+
+			a. project3/project3/forms.py
+				from django import forms
+				from django.contrib.auth.models import User
+
+				from django.contrib.auth.forms import UserCreationForm
+
+				class MyRegistrationForm(UserCreationForm):	
+					email = forms.EmailField( required=True )
+
+					class Meta:
+						model = User
+						fields = ( 'username', 'email', 'password1', 'password2' )
+				def save(self, commit=True):
+					user = super(UserCreationForm, self).save(commit=false)
+					user.email = self.cleaned_data['email']
+
+					if commit:
+						user.save()
+
+					return user
+
+			b. project3/project3/views.py
+
+				from django.shortcuts import render_to_response
+				from django.http import HttpResponseRedirect
+				from django.contrib import auth
+				from django.core.context_processors import csrf
+
+				from django.contrib.auth.forms import UserCreationForm
+
+				from forms import MyRegistrationForm
+
+
+				def login(request):
+					c = {}
+					c.update(csrf(request))
+					return render_to_response('login.html', c)
+
+				def auth_view(request):
+					username = request.POST.get('username', '')
+					password = request.POST.get('password', '')
+					user = auth.authenticate(username=username, password=password)
+
+					if user is not None:
+						auth.login(request, user)
+						return HttpResponseRedirect('/accounts/loggedin')
+					else:
+						return HttpResponseRedirect('/accounts/invalid')
+
+				def loggedin(request):
+					return render_to_response('loggedin.html',
+											  {'full_name' : request.user.username})
+
+				def invalid_login(request):
+					return render_to_response('invalid_login.html')
+
+				def logout(request):
+						auth.logout(request)
+						return render_to_response('logout.html')
+
+
+				def register_user(request):
+					if request.method == 'POST':
+						# form = UserCreationForm(request.POST)
+						form = MyRegistrationForm(request.POST)
+						if form.is_valid():
+							form.save()
+							return HttpResponseRedirect('/accounts/register_success')
+					
+					args = {}
+					args.update(csrf(request))
+
+					# args['form'] = UserCreationForm()
+					args['form'] = MyRegistrationForm()
+					print args
+					return render_to_response('register.html', args)
+
+				def register_success(request):
+					return render_to_response('register_success.html')
+
+		13. CRUD FORMS
+
+			Form for Article: project3/article
+
+			a. project3/article/forms.py
+				from django import forms
+				from models import Article
+
+				class ArticleForm(forms.ModelForm):
+
+					class Meta:
+						model = Article
+						fields = ('title', 'body', 'pub_date')
+			b. project3/article/urls.py
+				from django.conf.urls import patterns, include, url
+
+				urlpatterns = patterns('',
+					url(r'^all/$', 'article.views.articles'),
+					url(r'^get/(?P<article_id>\d+)/$', 'article.views.article'),
+					url(r'^language/(?P<language>[a-z\-]+)/$', 'article.views.language'),
+					url(r'^create/$', 'article.views.create'),
+				)
+			c. project3/article/views.py
+				# from django.shortcuts import render
+				from django.http import HttpResponse
+				from django.template.loader import get_template 
+				from django.shortcuts import render_to_response
+				from django.template import Context
+				from django.views.generic.base import TemplateView
+				from article.models import Article
+
+				from forms import ArticleForm
+				from django.http import HttpResponseRedirect
+				from django.core.context_processors import csrf
+
+
+
+				def articles(request):
+					language = 'en-us'
+					session_language = 'en-us'
+
+					if 'lang' in request.COOKIES:
+						language = request.COOKIES['lang']
+
+					if 'lang' in request.session:
+						session_language = request.session['lang']
+
+					return render_to_response('articles.html',
+											 {'articles': Article.objects.all(),
+											  'language' : language, 
+											  'sess_language' : session_language })
+
+
+				def article(request,article_id=1):
+					return render_to_response('article.html',
+											 {'article': Article.objects.get(id=article_id) })
+				def language(request, language='en-us'):
+					response = HttpResponse("setting language %s" % language)
+
+					response.set_cookie('lang', language)
+					request.session['lang'] = language
+					return response
+
+				def hello(request):
+					name="Hadley"
+					html = "<html><body><p>Hi my name is %s. Happy to see you</p></body></html>" % name
+					return HttpResponse(html)
+
+				def hello_template(request):
+					name="Hadley"
+					t = get_template('hello.html')
+					html = t.render(Context({'name':name}))
+					return HttpResponse(html)
+
+				def hello_template_simple(request):
+					name="Hadley"
+					return render_to_response('hello.html', {'name':name})
+
+				class HelloTemplate(TemplateView):
+
+					template_name = 'hello_class.html'
+
+					def get_context_data(self, **kwargs):
+						context = super(HelloTemplate, self).get_context_data(**kwargs)
+						context['name'] = 'Hadley'
+						return context
+
+
+				def create(request):
+					if request.POST:
+						form = ArticleForm(request.POST)
+						if form.is_valid():
+							form.save()
+
+							return HttpResponseRedirect('/articles/all/')
+					else:
+						form = ArticleForm()
+
+					args = {}
+					args.update(csrf(request))
+					args['form'] = form
+
+					return render_to_response('create_article.html', args)
+			d. project3/templates/create_article.py
+				{% extends 'base.html' %}
+
+				{% block sidebar %}
+					<ul>
+						<li><a href="/article/all">Cancel</a></li>
+					</ul>
+				{% endblock %}
+
+				{% block content %}
+					<form action="/articles/create/" method="post">{% csrf_token %}
+					<ul>
+						{{form.as_ul}}
+					</ul>
+						<input type="submit" name="submit" value="Create Article" />
+					</form>
+				{% endblock %}
+			e. project3/templates/articles.html	
+				{% extends 'base.html' %}
+
+
+				{% block title %}Articles in Apps folder{% endblock %}
+				{% block sidebar %}	
+					<a href="/articles/all/">Articles</a>
+					<a href="/articles/create/">Create Article</a>
+				{% endblock %}
+				{% block content %}
+					<h1>Articles in Apps folder</h1>
+					{% if articles.count > 0 %}
+						{% for article in articles %}
+							<h1>Title: <a href="/articles/get/{{article.id}}/"> {{ article.title|upper }}</a></h1>
+							<p>Body: </p>
+							<p>{{ article.body|lower|truncatewords:"3" }}</p>
+						{% endfor %}
+					{% else %}
+						<p>no records to show</p>
+					{% endif %}
+				{% endblock %}
+				</body>
+				</html>		
+			f. project3/article/models.py
+				from django.db import models
+
+				class Article(models.Model):
+					title = models.CharField(max_length=200)
+					#*django model types*
+					body = models.TextField()
+					#* text area no restrictions*
+					pub_date = models.DateTimeField('date published')
+					likes = models.IntegerField(blank=True, null=True)
+
+				# this is for shell scripting
+				def __unicode__(self):
+					return self.title		
+
+		14. FORMS FOR DATABASE MODEL
+			
+			a. project3/article/models.py
+				from django.db import models
+
+				class Article(models.Model):
+					title = models.CharField(max_length=200)
+					#*django model types*
+					body = models.TextField()
+					#* text area no restrictions*
+					pub_date = models.DateTimeField('date published')
+					likes = models.IntegerField(default=0, blank=True, null=True)
+
+				# this is for shell scripting
+				def __unicode__(self):
+					return self.title
+
+			b. project3/article/forms.py
+				from django import forms
+				from models import Article
+
+				class ArticleForm(forms.ModelForm):
+
+					class Meta:
+						model = Article
+						fields = ('title', 'body', 'pub_date')
+
+			c. project3/article/urls.py
+				from django.conf.urls import patterns, include, url
+
+				urlpatterns = patterns('',
+					url(r'^all/$', 'article.views.articles'),
+					url(r'^get/(?P<article_id>\d+)/$', 'article.views.article'),
+					url(r'^language/(?P<language>[a-z\-]+)/$', 'article.views.language'),
+					url(r'^create/$', 'article.views.create'),
+				)
+
+
+
+			d. project3/article/views.py
+				# from django.shortcuts import render
+				from django.http import HttpResponse
+				from django.template.loader import get_template 
+				from django.shortcuts import render_to_response
+				from django.template import Context
+				from django.views.generic.base import TemplateView
+				from article.models import Article
+
+				from forms import ArticleForm
+				from django.http import HttpResponseRedirect
+				from django.core.context_processors import csrf
+
+
+
+				def articles(request):
+					language = 'en-us'
+					session_language = 'en-us'
+
+					if 'lang' in request.COOKIES:
+						language = request.COOKIES['lang']
+
+					if 'lang' in request.session:
+						session_language = request.session['lang']
+
+					return render_to_response('articles.html',
+											 {'articles': Article.objects.all(),
+											  'language' : language, 
+											  'sess_language' : session_language })
+
+
+				def article(request,article_id=1):
+					return render_to_response('article.html',
+											 {'article': Article.objects.get(id=article_id) })
+				def language(request, language='en-us'):
+					response = HttpResponse("setting language %s" % language)
+
+					response.set_cookie('lang', language)
+					request.session['lang'] = language
+					return response
+
+				def hello(request):
+					name="Hadley"
+					html = "<html><body><p>Hi my name is %s. Happy to see you</p></body></html>" % name
+					return HttpResponse(html)
+
+				def hello_template(request):
+					name="Hadley"
+					t = get_template('hello.html')
+					html = t.render(Context({'name':name}))
+					return HttpResponse(html)
+
+				def hello_template_simple(request):
+					name="Hadley"
+					return render_to_response('hello.html', {'name':name})
+
+				class HelloTemplate(TemplateView):
+
+					template_name = 'hello_class.html'
+
+					def get_context_data(self, **kwargs):
+						context = super(HelloTemplate, self).get_context_data(**kwargs)
+						context['name'] = 'Hadley'
+						return context
+
+
+				def create(request):
+					if request.POST:
+						form = ArticleForm(request.POST)
+						if form.is_valid():
+							form.save()
+
+							return HttpResponseRedirect('/articles/all/')
+					else:
+						form = ArticleForm()
+
+					args = {}
+					args.update(csrf(request))
+					args['form'] = form
+
+					return render_to_response('create_article.html', args)
+
+			e. project3/templates/create_article.html
+				{% extends 'base.html' %}
+
+				{% block sidebar %}
+				<ul>
+					<li><a href="/article/all">Cancel</a></li>
+				</ul>
+				{% endblock %}
+
+				{% block content %}
+				<form action="/articles/create/" method="post">{% csrf_token %}
+				<ul>
+					{{form.as_ul}}
+				</ul>
+					<input type="submit" name="submit" value="Create Article" />
+				</form>
+				{% endblock %}
+
+
+
+		15. UPDATING DATABASE RECORDS
+
+			adding likes to articles
+
+			a. project3/templates/article.html
+				<!DOCTYPE html>
+				<html>
+				<head>
+				<title>{{ article.title }}</title>
+				</head>
+				<body>
+
+				<h1>Title: {{ article.title }}</h1>
+				<p>Body: </p>
+				<p>{{ article.body }}</p>
+				<p>{{ article.likes }} people liked this article</p>
+				<a href="/articles/like/{{article.id}}">Like</a>
+				<p>------------------------</p>
+				</body>
+				</html>
+
+			b. project3/article/urls.py
+				from django.conf.urls import patterns, include, url
+
+				urlpatterns = patterns('',
+					url(r'^all/$', 'article.views.articles'),
+					url(r'^get/(?P<article_id>\d+)/$', 'article.views.article'),
+					url(r'^language/(?P<language>[a-z\-]+)/$', 'article.views.language'),
+					url(r'^create/$', 'article.views.create'),
+					url(r'^like/(?P<article_id>\d+)/$', 'article.views.like_article'),
+				)
+
+			c. project3/article/views.py
+
+				# from django.shortcuts import render
+				from django.http import HttpResponse
+				from django.template.loader import get_template 
+				from django.shortcuts import render_to_response
+				from django.template import Context
+				from django.views.generic.base import TemplateView
+				from article.models import Article
+
+				from forms import ArticleForm
+				from django.http import HttpResponseRedirect
+				from django.core.context_processors import csrf
+
+
+
+				def articles(request):
+					language = 'en-us'
+					session_language = 'en-us'
+
+					if 'lang' in request.COOKIES:
+						language = request.COOKIES['lang']
+
+					if 'lang' in request.session:
+						session_language = request.session['lang']
+
+					return render_to_response('articles.html',
+											 {'articles': Article.objects.all(),
+											  'language' : language, 
+											  'sess_language' : session_language })
+
+
+				def article(request,article_id=1):
+					return render_to_response('article.html',
+											 {'article': Article.objects.get(id=article_id) })
+				def language(request, language='en-us'):
+					response = HttpResponse("setting language %s" % language)
+
+					response.set_cookie('lang', language)
+					request.session['lang'] = language
+					return response
+
+				def hello(request):
+					name="Hadley"
+					html = "<html><body><p>Hi my name is %s. Happy to see you</p></body></html>" % name
+					return HttpResponse(html)
+
+				def hello_template(request):
+					name="Hadley"
+					t = get_template('hello.html')
+					html = t.render(Context({'name':name}))
+					return HttpResponse(html)
+
+				def hello_template_simple(request):
+					name="Hadley"
+					return render_to_response('hello.html', {'name':name})
+
+				class HelloTemplate(TemplateView):
+
+					template_name = 'hello_class.html'
+
+					def get_context_data(self, **kwargs):
+						context = super(HelloTemplate, self).get_context_data(**kwargs)
+						context['name'] = 'Hadley'
+						return context
+
+
+				def create(request):
+					if request.POST:
+						form = ArticleForm(request.POST)
+						if form.is_valid():
+							form.save()
+
+							return HttpResponseRedirect('/articles/all/')
+					else:
+						form = ArticleForm()
+
+					args = {}
+					args.update(csrf(request))
+					args['form'] = form
+
+					return render_to_response('create_article.html', args)
+
+
+				def like_article(request, article_id):
+					if article_id:
+						a = Article.objects.get(id=article_id)
+						count = a.likes
+						count += 1
+						a.likes = count
+						a.save()
+
+					return HttpResponseRedirect('/articles/get/%s' % article_id)
+		
+		16. UPLOADING FILES
+
+			a. project3/project3/settings.py
+
+				MEDIA_ROOT = os.path.join(BASE_DIR, 'static', 'media')
+			
+			b. project3/article/models.py
+
+				from django.db import models
+				from time import time
+
+				def get_uplaod_file_name(instance, filename):
+					return "upload_files/%s_%s" % (str(time()).replace ('.','_'), filename)
+
+				class Article(models.Model):
+					title = models.CharField(max_length=200)
+					#*django model types*
+					body = models.TextField()
+					#* text area no restrictions*
+					pub_date = models.DateTimeField('date published')
+					likes = models.IntegerField(default=0, blank=True, null=True)
+					thumbnail = models.FileField(upload_to = get_upload_file_name)
+				# this is for shell scripting
+				def __unicode__(self):
+					return self.title
+
+
+			c. project3/templates/article.html
+
+				add : 
+
+					{% if article.thumbnail %}
+						<p>{{ article.thumbnail }}</p>
+					{% endif %}
+
+			d. project3/templates/create_article.html
+
+				change: 
+
+				<form action="/articles/create/" method="post" enctype="multipart/form-data">{% csrf_token %}
+	
+			e. project3/article/views.py
+
+						def create(request):
+							if request.POST:
+			
+							form = ArticleForm(request.POST, request.FILES)
+
+			f. python manage.py dumpdata article --indent=4 > article.json
+			g. cat article.json
+			h. python manage.py sqlclear article | python manage.py dbshell
+			i. python manage.py loaddata article.json
+			
+			OR 
+
+			g. python manage.py makemigrations
+			h. python manage.py migrate
+			i. python manage.py syncdb
+
+		17. AJAX SEARCH
+
+			a. project3/article/urls.py
+				url(r'^search/$', 'article.views.search_titles'),
+
+			b. project3/article/views.py
+
+				def articles add:
+
+					args = {}
+					args.update(csrf(request))
+
+					render to response ('articles.html', args)
+
+				def search_title(request):
+					if request.method == "POST":
+						search_text = request.POST['search_text']
+					else:
+						search_text = ''
+
+					articles = Article.objects.filter(title__contains=search_text)
+
+					return render_to_response('ajax_search.html', {'article' : articles})
+
+			c. project3/templates/ajax_search.html
+				{% if articles.count > 0 %}
+					{% for article in articles %}
+						<li><a href="/articles/get/{{ article.id }}/"{{ article.title }}></a></li>
+					{% endfor %}
+				{% else %}
+					<li>None to show!</li>
+				{% endif %}  
+
+			d. project3/templates/base.html
+
+				add:
+					head:
+						<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+						<script src="{% static 'js/ajax.js' %}"></script>
+
+			e. project3/templates/articles.html
+
+					sidebar:
+					<h3>Search</h3>
+					{% csrf_token %}
+
+					<input type="text" id="search" name="search" />
+					<ul id="search-results">
+					</ul>
+
+			e. add jquery in the js folder
+			f. add ajax.js in the js folder
+				$(function(){
+
+					$('#search').keyup(function(){
+
+							$.ajax({
+								type: "POST",
+								url: '/articles/search/',
+								data : {
+									'search_text' : $('#search').val(),
+									'csrfmiddlewaretoken' : $("input[name=csrfmiddlewaretoken]").val()
+								},
+								success: searchSuccess,
+								dataType: 'html'
+							});
+					});
+
+				});
+
+				function searchSuccess(data, textStatus, jqXHR)
+				{
+					$('#search-results').html(data);
+				}
+
+			g. python manage.py collectstatic
+
+
+		18. TASTY  - PIE WEB SERVICES
+			
+			built for apis or json/xml querires
+
+		19. SOUTH - MIGRATION CONTROL
+
+			keep track of your migration
+
+		
+
+
+
+
+
+
+
+
+
+INSTALLATION
+
+	Django Unchained -- https://www.youtube.com/watch?v=QdRiGZA7ZqU
+					-- webgeekstalk.com
+
+	download tar.biz
+
+	tar xzvf Django-1.7.tar (extract it)
+
+	sudo apt-get install python-setuptools
+
+	sudo python setup.py install
+
+	django-admin.py 
+
+	cd to home directory and start project django-admin.py startproject demo
+
+	cd into demo and run python manage.py runserver 
+
+	KILL SERVER - sudo fuser -k 8000/tcp
+
+	https://www.youtube.com/channel/UCFW_fvwCoF44MGWk74U_rFg
+
+	EASY INSTALL
+		1. sudo easy_install virtualenv==1.10.1
+		(virtual env will create a folder with global modules)
+
+		2. vitrualenv --no-site-packages <folder name>
+		3. source django-mike/bin/activate
+		4. cd django-mike/
+		5. easy_install Django
+		6. cd bin/
+		7. python django-admin.py
+		8. python django-admin.py django-test (create project) 
+
+		999. deactivate (switch off vitural env)
+
+SETTINGS.PY
+	<project folder>/<project folder>/settings.py
+
+	1. DATABASES = {
+		'ENGINE' : 'django.db.backends.sqlite3',
+		'NAME' : 'location.you.want.storeit.storage.db',
+		...
+		...
+	}
+
+	2. TIME_ZONE = 'America/Los_angeles'
+	3. LANGUAGE_CODE = 'en-us'
+
+START AN APP
+	
+	1. apps are like little modules or packages
+		example: App Article
+
+			1. python manage.py startapp article
+			2. cd article 
+				a. __init__.py (tellls python this is a module)
+				b. models
+				c. tests
+				d. views.py
+			3. subl models.py
+
+				from django.db import models
+
+				class Article(models.Model):
+					title = models.CharField(max_length=200)
+				#*django model types*
+				body = models.TextField()
+				#* text area no restrictions*
+				pub_date = models.DateTimeField('date published')
+				likes = models.IntegerField()
+
+				# this is for shell scripting
+				def __unicode__(self):
+					return self.title
+			4. python manage.py syncdb
+			5. superuser? blank
+			6. email?
+			7. password? 
+		# *sql database browser ?*
+
+			8. settings.py 	
+				INSTALLED APPS = (
+					'',
+					'<app name>',
+				)
+		#* python manage.py sql <table name>*
+
+			9. change article module and data types
+		#* python manage.py reset article
+			removes table from inside the database and data
+
+			10.  Database shell
+		#*  python manage.py shell*
+			1. from article.models import Article (import article model)
+			2. Article.object.all()
+			3. from django.utils import timezone
+			4. a= Article(title="test 1", body="blah", pub_date=timezone.now(), likes=0)
+			5. a.save()
+			6. a.id
+			7. from article.models. import Article
+				Article.objects.all()
+					(now items now has title in it because of def __unicode in article/models.py)
+			
+
+
+
+
+DJANGO BASICS 
+	MTV ( Model Template View )
+
+	Models are MODELS
+	Templates are VIEWS
+	Views are CONTROLLERS
+	
+	Model - is built into Django
+	Templates - can be more than html (XML, EMAIL, CSV)
+
+	$ python -c "import django; print(django.get_version())"
+
+SETUP DJANGO PROJECT
+
+	Create project:
+
+		1. django-admin.py startproject project1
+
+	Launch project:
+
+		1. cd into project folder
+		2. manage.py runserver
+
+	Create folders inside first project folder:
+		
+		mkdir apps media static templates 
+		cd static && mkdir images js css
+
+		1. creates apps, media, static, templates folder
+		2. inside the static folder create js, css, images folders
+	
+	APPS APPS APPS
+		
+		1. Apps folder create "__init__.py"
+		2. django-admin.py startapp <app name>
+
+	MODELS MODELS MODELS
+
+		1. Create database in PHPMyadmin
+		2. Settings.py in second project1/project1/ folder
+		3. 
+			DATABASES = {
+			    'default' : {
+			        'ENGINE': 'django.db.backends.mysql',
+			        'NAME': 'project1',
+			        'USER' : 'root',
+			        'PASSWORD' : 'hado',
+			        'HOST' : 'localhost',
+			        'PORT' : '',
+			    }
+			    
+			}
+		4. 
+
+			INSTALLED_APPS = (
+			    # 'django.contrib.admin',
+			    # 'django.contrib.auth',
+			    # 'django.contrib.contenttypes',
+			    # 'django.contrib.sessions',
+			    # 'django.contrib.messages',
+			    # 'django.contrib.staticfiles',
+			    'apps.book_listing',
+			)
+
+		5. Models.py
+
+			class Author(models.Model):
+				name = models.CharField(max_length=100)
+				created_at = models.DateTimeField()	
+
+				class Meta: 
+					db_table = 'authors'
+
+			class Book(models.Model):
+				author = models.ForeignKey(Author)
+				title = models.CharField(max_length=100)
+				description = models.TextField()
+				created_at = models.DateTimeField()
+
+				class Meta: 
+					db_table = 'books'
+
+		6. INSTALL MYSQL MODULE
+
+			sudo apt-get install python-mysqldb
+
+		7. MIGRATION SUCKA
+			python manage.py makemigrations
+		
+		8. SYNC DB
+			1. cd into first Project1
+			2. 	manage.py syncdb
+
+	URLS.py
+
+			1. uncomment:
+   				 url(r'^$', 'project1.views.home', name='home'),
+
+   	CREATE VIEW 1
+   			1. in project1/project1/
+   			2. 
+	   			from django.http import HttpResponse
+				import datetime
+
+				def home(request):
+					now = datetime.datetime.now()
+					message = """
+				<html>
+					<body>
+						<h1>Welcome to Django!</h1>
+						<h4>Today is %s </h4>
+					</body>
+				</html>
+				""" % now
+
+					return HttpResponse(message)
+
+	TEMPLATES
+			1. in settings.py
+			2. 
+				TEMPLATE_DIRS = (
+				    'templates',
+				)
+
+	ADJUST VIEW FOR TEMPLATE
+			
+			1. in project1/project1/views.py
+
+			from django.shortcuts import render_to_response
+			from django.template import RequestContext
+
+			def home(request):
+				return render_to_response('index.html', context_instance = RequestContext(request)) 
+
+	CONFIGURATION
+
+		ADDING AN APP TO URL			    url(r'^books/', include('app.books_listing.urls')),
+
+	LINKS
+		alias from project1 urls.py:
+		<a href="{% url 'contact_us' %}">Click here to COntact</a>
+
+	ADDING APPS LINKS
+
+		1.	project1/project1/urls.py
+
+			from django.conf.urls import patterns, include, url
+			from django.contrib import admin
+
+			urlpatterns = patterns('',
+			    # Examples:
+			    url(r'^$', 'project1.views.home', name='home'),
+			    url(r'^contact', 'project1.views.contactus', name='contact_us'),
+			    # url(r'^blog/', include('blog.urls')),
+			    url(r'^books/', include('apps.book_listing.urls')),
+			    # url(r'^reviews/', include('app.user_reviews.urls')),
+
+			    url(r'^admin/', include(admin.site.urls)),
+			)
+		2. book_listing/urls.py
+
+			from django.conf.urls import patterns, include, url
+
+			urlpatterns = patterns('apps.book_listing.views',
+					url(r'^listing', 'book_list', name='book_list'),
+			)
+		3. book_listing/views.py
+			from django.shortcuts import render_to_response
+			from django.template import RequestContext
+
+			def book_list(request):
+				book_data = {
+					'title' : 'The Outsiders',
+					'author' : 'Dumbass'
+				}
+				
+				print book_data
+				return render_to_response('book_listing/detail.html', book_data, context_instance=RequestContext(request))
+		4. templates/book_listing/detail.html
+
+	MYQL QUERIES
+
+		https://docs.djangoproject.com/en/dev/topics/db/queries/
+
+		1. apps/book_listing/views.py
+
+		from django.shortcuts import render_to_response
+		from django.template import RequestContext
+
+		from apps.book_listing.models import Book
+
+		def book_list(request):
+			# book_data = {
+			# 	'title' : 'The Outsiders',
+			# 	'author' : 'Dumbass'
+			# }
+			
+			#book_info = Book.objects.all()
+			#book_info = Book.objects.all()[1:2]
+
+			book_info = Book.objects.raw("SELECT * from books")
+			book_data = {
+				"book_detail" : book_info 
+			}
+			print book_data
+			return render_to_response('book_listing/detail.html', book_data, context_instance=RequestContext(request))
+
+	FORMS
+
+		1. templates/user_profile/registration.html
+
+			<form action="" method="post">
+				{% csrf_token %}
+				<label for="name">Name: </label>
+				<input type="text" id="name" name="name" />
+				<label for="email">Email: </label>
+				<input type="text" id="email" name="email" />
+				<label for="password">Password: </label>
+				<input type="password" id="password" name="password" />	
+				<input type="submit" value="Add User" />
+			</form>
+		
+		2. project2/project2/views.py
+
+			from django.shortcuts import render_to_response 
+			from django.template import RequestContext
+			from apps.user_profile.models import User
+
+			def home(request):
+				user_name = request.POST.get('name')
+				user_email = request.POST.get('email')
+				user_password = request.POST.get('password')
+
+				User.objects.create(name=user_name, email=user_email, password=user_password)
+				
+				return render_to_response('user_profile/registration.html', context_instance=RequestContext(request))
+
+		3.  project2/project2/urls.py
+
+			from django.conf.urls import patterns, include, url
+			from django.contrib import admin
+
+			urlpatterns = patterns('',
+			    # Examples:
+			    url(r'^$', 'project2.views.home', name='home'),
+			    # url(r'^blog/', include('blog.urls')),
+
+			    url(r'^admin/', include(admin.site.urls)),
+			)
+
+		4. project2/project2/settings.py
+
+			TEMPLATE_DIRS = (
+			    BASE_DIR + '/templates/',
+			)
+	
+	BASE TEMPLATE
+
+		1.  project1/templates/base.html
+
+			<!DOCTYPE html>
+			<html>
+			<head>
+				<title>{% block title %} {% endblock %}</title>
+			</head>
+			<body>
+				<h1>BASE THEME</h1>
+				{% block content %}{% endblock %}
+				<p>yee base theme</p>
+
+			</body>
+			</html>
+
+		2. project1/templates/index.html
+
+			{% extends "base.html" %}
+
+			{% block title %} Welcome to project 1 {% endblock %}
+
+				{% block content %}
+					<h1> Django Unchained Project 1 </h1>
+					<a href="#">Click here to Contact</a>
+				{% endblock %}
+
+
+						
+		
