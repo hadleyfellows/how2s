@@ -1,21 +1,16 @@
+BOWER README
 
 BOWER INSTALL
-
-	1. npm install -g bower
-	2. cd to <project>/public/
-	3. sudo bower install angular --alow-root
-	4. sudo bower install underscore --allow-root
-	
-	/** Create bower install file */
-	
-	6. sudo bower init --allow-root
-	7. follow the form < aka press enter a bunch >
-	8. now bower.json file appears
-	
-	/** Install from bower.json file */
-
-	9. sudo bower install --allow-root 
-
-	/** Search for packages */
-
-	10. sudo bower search angular
+	npm install -g bower
+ADD BOWER PACKAGES
+	cd to <project>/public/
+	sudo bower install angular --alow-root
+	sudo bower install underscore --allow-root
+CREATE BOWER CONFIG FILE (bower.json)
+	sudo bower init --allow-root
+	follow the form < aka press enter a bunch >
+	now bower.json file appears in root directory
+INSTALL PACKAGES FROM CONFIG FILE (bower.josn)
+	sudo bower install --allow-root 
+SEARCH FOR PACKAGES
+	sudo bower search package_name
