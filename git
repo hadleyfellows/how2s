@@ -1,14 +1,11 @@
 GIT README
 
 BRANCHES
-	
 	git branch ( returns current branch )
 	git branch -a ( returns all branches )
 	git branch -r ( returns all remote brnaches )
 	git branch -b branch_name ( checks out new or existing branch )
-
 REMOTES
-
 	git remote ( see all remotes )
 	git remote -v ( shows the url of the git remotes )
 	git remote add [shortname] [url] ( add a remote repo )
@@ -16,27 +13,38 @@ REMOTES
 	git remote rm [shortname] ( removes remote repo )
 	git remote rename [shortname] [new-name] (rename remote repo )
 	git remote show ( shows a ll remtoe repos )
-
-	PUSHING
-
-		git push [remote-shortname] [branch-name] ( push to remote server)
-git bisect
+PUSHING
+	git push [remote-shortname] [branch-name] ( push to remote server)
+GIT BISECT
+	git bisect start
+        git bisect bad       
+        git bisect good <commit hash>
+	        git bisect good aa95f4a
+	*** Git will now bisect good from bad commits ***
+	Now test if problem is resolved:
+	yes: 
+		git bisect good
+	no: 
+		git bisect bad
+	Once complete
+		git bisect reset
+GIT SSH
+	INIT BARE REPO ON SERVER
+		cd folder/to/become/repository.git
+		git init --bare
+		Local
+	INIT REPO LOCALLY
+		cd folder/to/become/local/repository
+		git init
+	ADD REMOTE SERVER
+		git remote add remote_name ssh://$username@remote.hostname/path/to/repository.git
+		OR
+		git remote add remote_name /absolute/path/to/your/git/server/locally
+	PULL CHANGES
+		git pull remote_name master
+	PUSH CHANGES
+		git checkout -b branch_name
+		git push remote_name
 git cherry pick
 git hooks
 git subdamin
-
-
-
-Instant remote git repository using ssh
-These instructions assume that you can do an automatic login from a local to a remote machine using ssh keys for user $username.
-Remote
-
-cd folder/to/become/repository.git
-git init --bare
-Local
-
-cd folder/to/become/local/repository
-git init
-git remote add remote_name ssh://$username@remote.hostname/path/to/repository.git
-git pull remote_name master
-...and you're done, you've just gotta love git!
