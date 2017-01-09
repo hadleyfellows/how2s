@@ -46,8 +46,49 @@ GIT SSH
 		git checkout -b branch_name
 		git push remote_name
 git cherry pick
-git hooks
+git hooks (post-receive)
+# vim /srv/iris.git/hooks/post-receive
+#!/bin/sh                                                                                                                          	
+while read oldrev newrev ref                                                                                                      
+do                                                                                                                                
+  echo "oldrev: $oldrev"                                                                                                          
+  echo "newrev: $newrev"                                                                                                          
+  echo "ref: $ref"                                                                                                                
+  pwd                                                                                                                             
+                                                                                                                                  
+  if [ "$ref" = "refs/heads/master" ];                                                                                            
+  then                                                                                                                            
+    echo "Master ref received.  Deploying master branch to production..."                                                         
+    branchToDeploy="master"                                                                                                       
+  elif [ "$ref" = "refs/heads/master-deployment" ];                                                                               
+  then                                                                                                                            
+    echo "Master-deployment ref received.  Deploying master branch to production..."                                              
+    branchToDeploy="master-deployment"                                                                                            
+  elif [ "$ref" = "refs/heads/develop" ];                                                                                         
+  then                                                                                                                            
+    echo "Develop ref received.  Deploying develop branch to beta..."                                                             
+    branchToDeploy="develop"                                                                                                      
+  else                                                                                                                            
+    echo "Ref $ref successfully received.  Doing nothing: only master and develop branches may be deployed on this server."       
+    exit 0                                                                                                                        
+  fi                                                                                                                              
+                                                                                                                                  
+                                                                                                                                  
+  mkdir -p /var/www/html/folder-${branchToDeploy}                                                                                   
+  git --work-tree=/var/www/html/folder-${branchToDeploy} --git-dir=/srv/mybarerepo.git checkout -f ${branchToDeploy}                      
+  git rev-parse --short ${branchToDeploy} > /var/www/html/folder-${branchToDeploy}/folder-version                                     
+  chown -R apache:apache /var/www/html/folder-${branchToDeploy}                                                                     
+  pushd /var/www/html/folder-${branchToDeploy}                                                                                      
+    if [ -f example1.sh ]                                                                                                  
+    then                                                                                                                          
+      chmod +x example1.sh                                                                                                 
+      ./example1.sh ${branchToDeploy}                                                                                      
+    fi                                                                                                                            
+  popd                                                                                                                            
+done                                                                                                                              
+
 git subdamin
+git branch -r --no-merged
 
 git branch -m old_branch new_branch         # Rename branch locally    
 git push origin :old_branch                 # Delete the old branch    
