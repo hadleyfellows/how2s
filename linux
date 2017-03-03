@@ -349,4 +349,38 @@ SCP COMMAND
 		scp <file name> <ssh directory> (copy file)
 		scp -r ./<folder>/* <ssh directory> (copy folder contents)
 
-		
+find / -type f -name "*.conf"
+f: regular file
+d: directory
+l: symbolic link
+c: character devices
+b: block devices
+
+find / -size +700M
+find / -size 50c
+c: bytes
+k: Kilobytes
+M: Megabytes
+G: Gigabytes
+b: 512-byte blocks
+
+LINUX start services on boot
+/etc/init.d/
+- rc0.d
+- rc1.d
+- rc2.d
+ -rc3.d
+ -rc4.d
+ -rc5.d
+ -rc6.d
+
+SYNOPSIS
+chkconfig --list [name] 
+chkconfig --add name 
+chkconfig --del name 
+chkconfig [--level levels] name <on|off|reset> 
+chkconfig [--level levels] name 
+
+chkconfig httpd on
+chkconfig --list httpd
+
