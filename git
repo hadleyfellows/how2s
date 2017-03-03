@@ -33,6 +33,7 @@ GIT SSH
 		cd folder/to/become/repository.git
 		git init --bare
 		Local
+		git --work-tree=/var/www/html/<file directory> --git-dir=/<git bare server>.git checkout -f branch
 	INIT REPO LOCALLY
 		cd folder/to/become/local/repository
 		git init
@@ -40,11 +41,28 @@ GIT SSH
 		git remote add remote_name ssh://$username@remote.hostname/path/to/repository.git
 		OR
 		git remote add remote_name /absolute/path/to/your/git/server/locally
+		
+		git remote add af1 ssh://afello@afelloprint.com:/afellorepo.git
+		git remote set-url af1 ssh://afello@afelloprint.com:/afellorepo.git
+	
 	PULL CHANGES
 		git pull remote_name master
 	PUSH CHANGES
 		git checkout -b branch_name
 		git push remote_name
+GIT LOG
+	https://www.kernel.org/pub/software/scm/git/docs/git-log.html#_pretty_formats
+	git log --pretty=format:"%h; author: %cn; date: %ci; subject:%s" master e19d00d8e0c7b00ca71d37278ced47beecb4f73b..040304d324b813c186e1cc7ba6f7b580d2d40155 > log2.txt
+	git log --no-merges --pretty=format:"%h; author: %cn; date: %ci; subject:%s" master e19d00d8e0c7b00ca71d37278ced47beecb4f73b..040304d324b813c186e1cc7ba6f7b580d2d40155 > log3.txt
+	// remove lines with the update gazella build
+	sed -i '/Update Gazella build/d' log1.txt
+	sed -i '/Update Gazella build\|HOTFIX/d' log1.txt
+
+GIT SUBTREE
+	git remote add remote1 ssh://a@host.com/repo.git 
+	git subtree add --squash --prefix=<some directory>/ remote1 <branch name>
+	git subtree pull --squash --prefix=<some directory>/ remote1 <branch name>
+
 git cherry pick
 git hooks (post-receive)
 # vim /srv/iris.git/hooks/post-receive
